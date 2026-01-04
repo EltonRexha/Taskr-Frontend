@@ -39,7 +39,7 @@ function Navbar() {
     }, [])
 
     return (
-        <div className="py-2 lg:py-4">
+        <motion.div className="py-2 lg:py-4" initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 300, damping: 30, duration: 0.35 }}>
             <div className="h-14 p-4 flex items-center justify-between">
                 {/* Logo */}
                 <Image src={!isDark ? '/logo.png' : '/logo-dark.png'} alt="logo" width={80} height={30} className="lg:hidden"></Image>
@@ -63,6 +63,7 @@ function Navbar() {
                         <MenubarTrigger className="text-xl cursor-pointer">About</MenubarTrigger>
                         <MenubarContent>
                             <MenubarItem>Spaces</MenubarItem>
+                            <MenubarItem>Developer</MenubarItem>
                         </MenubarContent>
                     </MenubarMenu>
                 </Menubar>
@@ -105,6 +106,9 @@ function Navbar() {
                                         <button className="px-4 py-2 hover:bg-accent rounded-md text-left text-xl">
                                             Spaces
                                         </button>
+                                        <button className="px-4 py-2 hover:bg-accent rounded-md text-left text-xl">
+                                            Me
+                                        </button>
                                     </CollapsibleContent>
                                 </Collapsible>
                             </div>
@@ -112,7 +116,7 @@ function Navbar() {
                     </SheetContent>
                 </Sheet>
             </div>
-        </div>
+        </motion.div>
     )
 }
 
