@@ -37,7 +37,7 @@ export default function Page() {
           initial="hidden"
           className="text-4xl xl:text-9xl lg:text-8xl md:text-7xl sm:text-5xl lg:mx-12 lg:leading-26 xl:leading-36 mx-4 text-accent-darker font-bold tracking-wide text-center capitalize px-4 scale-y-120 select-none ">open source task management</motion.h1>
         <motion.a
-          href=""
+          href="/register"
           className="text-xl lg:text-3xl mt-16 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
           whileHover={{ scale: 1.01 }}
           initial={{y: -10, opacity: 0}}

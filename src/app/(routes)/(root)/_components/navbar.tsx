@@ -54,9 +54,17 @@ function Navbar() {
                     <MenubarMenu>
                         <MenubarTrigger className="text-xl cursor-pointer" >Get Started</MenubarTrigger>
                         <MenubarContent>
-                            <MenubarItem>Sign-up</MenubarItem>
+                            <MenubarItem>
+                                <Link href="/register" className="w-full">
+                                    Sign-up
+                                </Link>
+                            </MenubarItem>
                             <MenubarSeparator />
-                            <MenubarItem>Sign-in</MenubarItem>
+                            <MenubarItem>
+                                <Link href="/login" className="w-full">
+                                    Sign-in
+                                </Link>
+                            </MenubarItem>
                         </MenubarContent>
                     </MenubarMenu>
                     <MenubarMenu>
@@ -89,10 +97,14 @@ function Navbar() {
                                     </CollapsibleTrigger>
                                     <CollapsibleContent className="ml-4 mt-1 flex flex-col">
                                         <button className="px-4 py-2 hover:bg-accent rounded-md text-left text-xl">
-                                            Sign-up
+                                            <Link href="/register">
+                                                Sign-up
+                                            </Link>
                                         </button>
                                         <button className="px-4 py-2 hover:bg-accent rounded-md text-left text-xl">
-                                            Sign-in
+                                            <Link href="/login">
+                                                Sign-in
+                                            </Link>
                                         </button>
                                     </CollapsibleContent>
                                 </Collapsible>
