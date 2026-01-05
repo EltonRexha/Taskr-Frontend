@@ -2,15 +2,17 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import CoolDownBtn from "./CoolDownBtn";
 
 interface CodeInputProps {
     length?: number;
     onComplete: (code: string) => void;
     email: string;
     error?: string;
+    resend: () => void;
 }
 
-export function CodeInput({ length = 6, onComplete, email, error }: CodeInputProps) {
+export function CodeInput({ length = 6, onComplete, email, error, resend }: CodeInputProps) {
     const [values, setValues] = useState<string[]>(Array(length).fill(""));
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -53,43 +55,47 @@ export function CodeInput({ length = 6, onComplete, email, error }: CodeInputPro
     };
 
     return (
-        <div className="p-6 border-2 max-w-md mx-auto">
-            <h1 className="text-xl font-semibold text-foreground">Confirm Your Account</h1>
-            
-            <p className="text-muted-foreground mt-2">
-                We’ve sent a <strong>{length}-digit code</strong> to your email:{" "}
-                <span className="font-medium">{email}</span>.
-            </p>
+        <>
+            <div className="p-4 lg:p-6 lg:border-2 max-w-md mx-auto">
+                <h1 className="text-xl font-semibold text-foreground">Confirm Your Account</h1>
 
-            <p className="text-sm text-muted-foreground mt-1">
-                Please check your inbox (and spam/junk folder) and enter the code below to verify your account.
-            </p>
+                <p className="text-muted-foreground mt-2">
+                    We&apos;ve sent a <strong>{length}-digit code</strong> to your email:{" "}
+                    <span className="font-medium">{email}</span>.
+                </p>
 
-            <div className="flex gap-2 justify-center mt-4">
-                {values.map((val, idx) => (
-                    <Input
-                        key={idx}
-                        type="text"
-                        inputMode="numeric"
-                        maxLength={1}
-                        value={val}
-                        ref={(el) => {
-                            inputsRef.current[idx] = el;
-                        }}
-                        onChange={(e) => handleChange(e, idx)}
-                        onKeyDown={(e) => handleKeyDown(e, idx)}
-                        className="w-12 text-center text-lg h-10 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                    />
-                ))}
+                <div className="flex gap-2 justify-center mt-4">
+                    {values.map((val, idx) => (
+                        <Input
+                            key={idx}
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={1}
+                            value={val}
+                            ref={(el) => {
+                                inputsRef.current[idx] = el;
+                            }}
+                            onChange={(e) => handleChange(e, idx)}
+                            onKeyDown={(e) => handleKeyDown(e, idx)}
+                            className="w-12 text-center text-lg h-10 rounded-md border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        />
+                    ))}
+                </div>
+
+                {error && (
+                    <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
+                )}
+
+                <p className="text-sm text-muted-foreground mt-4">
+                    Please check your inbox (and spam/junk folder) and enter the code below to verify your account.
+                </p>
+
+
             </div>
-
-            {error && (
-                <p className="text-red-500 text-sm mt-2 text-center">{error}</p>
-            )}
-
             <p className="text-sm text-muted-foreground mt-4 text-center">
-                Didn’t receive the code? <button className="underline text-blue-600 hover:text-blue-800">Resend</button>
+                Didn&apos;t receive the code? <CoolDownBtn coolDownMs={15000} coolDownProps={{ "className": "text-gray-500 cursor-default" }} message="Resend" className="underline text-blue-600 hover:text-blue-800 cursor-pointer" onClick={resend} />
             </p>
-        </div>
+        </>
+
     );
 }
