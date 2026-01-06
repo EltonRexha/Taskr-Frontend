@@ -17,9 +17,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import PasswordInput from '@/components/PasswordInput';
-import { useSignUp } from '@clerk/nextjs';
+import { useSignIn, useSignUp } from '@clerk/nextjs';
 import { CodeInput } from './CodeInput';
 import { useRouter } from 'next/navigation';
+import { OAuthStrategy } from '@clerk/types'
 
 type FormData = z.infer<typeof UserSchema>;
 
@@ -78,7 +79,7 @@ function RegisterForm() {
 
     async function handleResend() {
         console.log('resend');
-        console.log({signUp});
+        console.log({ signUp });
         if (!signUp) return;
         try {
             setCodeError(undefined); // clear any previous error
@@ -87,6 +88,17 @@ function RegisterForm() {
         } catch (err: any) {
             setCodeError("Failed to resend verification code. Please try again.");
         }
+    }
+
+    const signUpWith = (strategy: OAuthStrategy) => {
+        if (!signUp) return;
+        return signUp.authenticateWithRedirect({
+            strategy,
+            redirectUrl: '/',
+            redirectUrlComplete: '/',
+        }).catch((err) => {
+            console.error("OAuth sign-up error:", err);
+        });
     }
 
     const email = watch("email");
@@ -177,7 +189,7 @@ function RegisterForm() {
                         <Button type="submit" className="cursor-pointer w-full h-12 text-lg">{signupLoading ? "loading..." : "Sign Up"}</Button>
                     </Field>
                     <Field className="w-full">
-                        <Button type="button" variant="outline" className="cursor-pointer w-full h-12 text-lg inline-flex items-center justify-center gap-2">
+                        <Button type="button" variant="outline" className="cursor-pointer w-full h-12 text-lg inline-flex items-center justify-center gap-2" onClick={() => signUpWith('oauth_google')}>
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />

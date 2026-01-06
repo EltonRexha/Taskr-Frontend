@@ -3,8 +3,9 @@
 import Navbar from "./_components/navbar";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DotGrid from "@/components/DotGrid";
+import { useUser } from "@clerk/nextjs";
 
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -12,6 +13,18 @@ const headerVariants = {
 }
 
 export default function Page() {
+  const { user, isSignedIn } = useUser();
+
+  useEffect(() => {
+    if (isSignedIn && user) {
+      console.log("User object:", user);
+      console.log("User ID:", user.id);
+      console.log("Email(s):", user.emailAddresses.map(e => e.emailAddress));
+      console.log("Full name:", user.firstName, user.lastName);
+    } else {
+      console.log("No user signed in");
+    }
+  }, [isSignedIn, user]);
   const [isHovering, setIsHovering] = useState(false);
 
   return <div className="min-h-screen w-full relative overflow-hidden">
@@ -40,8 +53,8 @@ export default function Page() {
           href="/register"
           className="text-xl lg:text-3xl mt-16 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
           whileHover={{ scale: 1.01 }}
-          initial={{y: -10, opacity: 0}}
-          animate={{y: 0, opacity: 1}}
+          initial={{ y: -10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           transition={{ type: "spring", stiffness: 300, damping: 20, duration: 0.45 }}
           onHoverStart={() => setIsHovering(true)}
           onHoverEnd={() => setIsHovering(false)}
