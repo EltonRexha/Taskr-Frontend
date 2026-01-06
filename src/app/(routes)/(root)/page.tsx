@@ -13,10 +13,10 @@ const headerVariants = {
 }
 
 export default function Page() {
-  const { user, isSignedIn } = useUser();
+  const { user } = useUser();
 
   useEffect(() => {
-    if (isSignedIn && user) {
+    if (user) {
       console.log("User object:", user);
       console.log("User ID:", user.id);
       console.log("Email(s):", user.emailAddresses.map(e => e.emailAddress));
@@ -24,7 +24,7 @@ export default function Page() {
     } else {
       console.log("No user signed in");
     }
-  }, [isSignedIn, user]);
+  }, [user]);
   const [isHovering, setIsHovering] = useState(false);
 
   return <div className="min-h-screen w-full relative overflow-hidden">
