@@ -19,7 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import PasswordInput from "@/components/PasswordInput"
 import { useState } from "react"
-import { SecondFactorAuth } from "./SecondFactor"
+import { SecondFactorAuth } from "../../../../../components/SecondFactor"
 import { toast } from "sonner"
 
 type FormData = z.infer<typeof LoginSchema>;

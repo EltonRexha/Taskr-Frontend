@@ -17,11 +17,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import PasswordInput from '@/components/PasswordInput';
-import { useSignIn, useSignUp } from '@clerk/nextjs';
-import { CodeInput } from './CodeInput';
+import { useSignUp } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { OAuthStrategy } from '@clerk/types'
 import { toast } from 'sonner';
+import { SecondFactorAuth } from '@/components/SecondFactor';
 
 type FormData = z.infer<typeof UserSchema>;
 
@@ -91,9 +91,8 @@ function RegisterForm() {
         };
 
         try {
-            setCodeError(undefined); // clear any previous error
+            setCodeError(undefined);
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-            alert(`Verification code resent to ${watch("email")}`);
         } catch (err: any) {
             setCodeError("Failed to resend verification code. Please try again.");
         }
@@ -221,7 +220,7 @@ function RegisterForm() {
                 </FieldGroup>
             </form>
             {showDisplayCode && (
-                <CodeInput onComplete={(code) => { handleCodeComplete(code) }} email={email} error={codeError} resend={handleResend} />
+                <SecondFactorAuth onComplete={(code) => { handleCodeComplete(code) }} email={email} error={codeError} resend={handleResend} />
             )}
         </>
     )

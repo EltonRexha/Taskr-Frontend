@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import CoolDownBtn from "./CoolDownBtn";
+import CoolDownBtn from "../app/(routes)/(auth)/register/_component/CoolDownBtn";
 
 interface CodeInputProps {
     length?: number;
@@ -12,7 +12,7 @@ interface CodeInputProps {
     resend: () => void;
 }
 
-export function CodeInput({ length = 6, onComplete, email, error, resend }: CodeInputProps) {
+export function SecondFactorAuth({ length = 6, onComplete, email, error, resend }: CodeInputProps) {
     const [values, setValues] = useState<string[]>(Array(length).fill(""));
     const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -57,7 +57,7 @@ export function CodeInput({ length = 6, onComplete, email, error, resend }: Code
     return (
         <>
             <div className="p-4 lg:p-6 lg:border-2 max-w-md mx-auto">
-                <h1 className="text-xl font-semibold text-foreground">Confirm Your Account</h1>
+                <h1 className="text-xl font-semibold text-foreground">Second Factor Authentication</h1>
 
                 <p className="text-muted-foreground mt-2">
                     We&apos;ve sent a <strong>{length}-digit code</strong> to your email:{" "}
@@ -87,7 +87,7 @@ export function CodeInput({ length = 6, onComplete, email, error, resend }: Code
                 )}
 
                 <p className="text-sm text-muted-foreground mt-4">
-                    Please check your inbox (and spam/junk folder) and enter the code below to verify your account.
+                    Please check your inbox (and spam/junk folder) and enter the code below to login to your account.
                 </p>
 
 
