@@ -13,13 +13,14 @@ import Link from "next/link"
 import { OAuthStrategy } from '@clerk/types'
 import { useSignIn } from "@clerk/nextjs"
 import { LoginSchema } from "@/schemas/loginSchema"
-import z from "zod"
+import z, { set } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import PasswordInput from "@/components/PasswordInput"
 import { useState } from "react"
 import { SecondFactorAuth } from "./SecondFactor"
+import { toast } from "sonner"
 
 type FormData = z.infer<typeof LoginSchema>;
 
@@ -34,21 +35,29 @@ function LoginForm() {
     const [codeError, setCodeError] = useState<string | undefined>(undefined);
     const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
-    const signInWith = (strategy: OAuthStrategy) => {
-        if (!signIn) return;
-        return signIn.authenticateWithRedirect({
-            strategy,
-            redirectUrl: '/',
-            redirectUrlComplete: '/',
-        }).catch((err) => {
-            console.error("OAuth sign-in error:", err);
-        });
+    const signInWith = async (strategy: OAuthStrategy) => {
+        if (!signIn) {
+            toast.error("Sign-in is not available at the moment. Please try again later.");
+            return;
+        };
+
+        try {
+            await signIn.authenticateWithRedirect({
+                strategy,
+                redirectUrl: '/',
+                redirectUrlComplete: '/',
+            })
+        } catch (err) {
+            toast.error("Couldn't sign in with the selected provider. Please try again.");
+        }
+
     }
 
-    async function onSubmit({ email, password }: FormData) {
-        console.log('on submit called')
-        if (!signIn) return;
-        console.log('signIn exists')
+    const onSubmit = async ({ email, password }: FormData) => {
+        if (!signIn) {
+            toast.error("Sign-in is not available at the moment. Please try again later.");
+            return;
+        };
 
         try {
             const result = await signIn.create({
@@ -56,35 +65,41 @@ function LoginForm() {
                 password,
             })
 
-            console.log('result', result.status);
-
             if (result.status === "complete") {
                 router.push("/")
             }
 
             if (result.status === "needs_second_factor") {
-                console.log('needs second factor');
                 await signIn.prepareSecondFactor({
                     strategy: "email_code",
                 })
-                console.log('sent second factor');
                 setShowSecondFactor(true);
             }
         } catch (err: any) {
-            setLoginError(err.errors?.[0]?.longMessage || "An error occurred during sign in. Please try again.");
+            if (err.errors[0].code === "strategy_for_user_invalid") {
+                setLoginError("Please try to login with your correct provider below.");
+            } else {
+                setLoginError(err.errors?.[0]?.longMessage || "An error occurred during sign in. Please try again.");
+            }
         }
     }
 
-    async function handleResend() {
-        if (!signIn) return;
+    const handleResend = async () => {
+        if (!signIn) {
+            toast.error("Sign-in is not available at the moment. Please try again later.");
+            return;
+        };
 
         await signIn.prepareSecondFactor({
             strategy: "email_code",
         })
     }
 
-    async function handleCodeComplete(code: string) {
-        if (!signIn) return;
+    const handleCodeComplete = async (code: string) => {
+        if (!signIn) {
+            toast.error("Sign-in is not available at the moment. Please try again later.");
+            return;
+        };
 
         try {
             await signIn.attemptSecondFactor({
@@ -112,9 +127,9 @@ function LoginForm() {
             <form className={`p-4 lg:p-6 lg:border-2 ${showSecondFactor && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                     <FieldSet>
-                        <FieldLegend><p className="text-xl">Create Account</p></FieldLegend>
+                        <FieldLegend><p className="text-xl">Welcome Back!</p></FieldLegend>
                         <FieldDescription>
-                            Sign up for a new account
+                            Please Enter Your Credentials
                         </FieldDescription>
                         <FieldGroup>
                             <Field>
