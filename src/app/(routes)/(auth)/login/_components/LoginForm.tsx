@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { OAuthStrategy } from '@clerk/types'
-import { useSignIn } from "@clerk/nextjs"
+import { SignIn, useSignIn } from "@clerk/nextjs"
 import { LoginSchema } from "@/schemas/loginSchema"
 import z, { set } from "zod"
 import { useForm } from "react-hook-form"
@@ -21,6 +21,7 @@ import PasswordInput from "@/components/PasswordInput"
 import { useState } from "react"
 import { SecondFactorAuth } from "../../../../../components/SecondFactor"
 import { toast } from "sonner"
+import PasswordReset from "./PasswordReset"
 
 type FormData = z.infer<typeof LoginSchema>;
 
@@ -32,6 +33,7 @@ function LoginForm() {
     const { signIn } = useSignIn();
     const router = useRouter()
     const [showSecondFactor, setShowSecondFactor] = useState(false);
+    const [showResetPassword, setShowResetPassword] = useState(false);
     const [codeError, setCodeError] = useState<string | undefined>(undefined);
     const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
@@ -84,18 +86,23 @@ function LoginForm() {
         }
     }
 
-    const handleResend = async () => {
+    const handleSecondFactorResend = async () => {
         if (!signIn) {
             toast.error("Sign-in is not available at the moment. Please try again later.");
             return;
         };
 
-        await signIn.prepareSecondFactor({
-            strategy: "email_code",
-        })
+        try {
+            await signIn.prepareSecondFactor({
+                strategy: "email_code",
+            })
+        } catch (err: any) {
+            toast.error("Failed to resend email");
+        }
+
     }
 
-    const handleCodeComplete = async (code: string) => {
+    const handleSecondFactor = async (code: string) => {
         if (!signIn) {
             toast.error("Sign-in is not available at the moment. Please try again later.");
             return;
@@ -124,7 +131,7 @@ function LoginForm() {
 
     return (
         <>
-            <form className={`p-4 lg:p-6 lg:border-2 ${showSecondFactor && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}>
+            <form className={`p-4 lg:p-6 lg:border-2 ${(showSecondFactor || showResetPassword) && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}>
                 <FieldGroup>
                     <FieldSet>
                         <FieldLegend><p className="text-xl">Welcome Back!</p></FieldLegend>
@@ -165,7 +172,7 @@ function LoginForm() {
                     )}
                     <div className="flex flex-col gap-1">
                         <Link href="/register" className="text-blue-500 w-fit">Don't have an account?</Link>
-                        <Link href="/register" className="text-blue-500 w-fit">Forgot your password?</Link>
+                        <button type="button" className="text-blue-500 w-fit cursor-pointer" onClick={() => setShowResetPassword(true)}>Forgot your password?</button>
                     </div>
                     <Field className="w-full">
                         <Button type="submit" className="w-full h-12 text-lg cursor-pointer">Login</Button>
@@ -184,8 +191,9 @@ function LoginForm() {
                 </FieldGroup>
             </form>
             {showSecondFactor && (
-                <SecondFactorAuth onComplete={(code) => { handleCodeComplete(code) }} email={email} error={codeError} resend={handleResend} />
+                <SecondFactorAuth onComplete={(code) => { handleSecondFactor(code) }} email={email} error={codeError} resend={handleSecondFactorResend} />
             )}
+            {showResetPassword && <PasswordReset />}
         </>
 
     )
