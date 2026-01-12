@@ -27,7 +27,7 @@ function PasswordInput({ error, ...props }: { error?: string;[key: string]: any 
                 </button>
             </div>
             {error && (
-                <p className="text-red-500 text-sm mt-1">{error}</p>
+                <p className="text-red-500 text-sm -mb-2">{error}</p>
             )}
         </>
 

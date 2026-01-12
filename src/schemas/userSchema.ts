@@ -14,6 +14,7 @@ export const UserSchema = z
             .regex(/^[a-zA-Z]+$/, 'First name can only contain letters'),
         lastName: z
             .string()
+            .nonempty('Last Name is required')
             .max(20, 'Last name is too long')
             .min(3, 'Last name is too short')
             .regex(/^[a-zA-Z]+$/, 'Last name can only contain letters')

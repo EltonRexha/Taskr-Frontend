@@ -1,16 +1,11 @@
 'use client'
 
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { UserSchema } from "@/schemas/userSchema"
-
-import z from "zod"
 import RegisterForm from "./_component/RegisterForm"
 import BackBtn from "./_component/BackBtn"
-
+import { AnimatePresence } from "framer-motion";
 
 function page() {
+
     return (
         <div className="flex flex-col min-h-screen bg-background">
             <div className="p-4">

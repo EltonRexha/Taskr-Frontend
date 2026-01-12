@@ -22,8 +22,14 @@ import { useRouter } from 'next/navigation';
 import { OAuthStrategy } from '@clerk/types'
 import { toast } from 'sonner';
 import { SecondFactorAuth } from '@/components/SecondFactor';
+import { motion } from 'framer-motion';
 
 type FormData = z.infer<typeof UserSchema>;
+
+const variants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+}
 
 function RegisterForm() {
     const { signUp, setActive } = useSignUp();
@@ -36,12 +42,11 @@ function RegisterForm() {
     const [signupLoading, setSignupLoading] = useState(false);
     const router = useRouter();
 
-    const onSubmit = async (data: FormData) => {
-        if (!signUp) {
-            toast.error("Sign-up is not available at the moment. Please try again later.");
-            return;
-        };
+    if (!signUp) {
+        return;
+    };
 
+    const onSubmit = async (data: FormData) => {
         setSignupLoading(true);
 
         try {
@@ -62,11 +67,6 @@ function RegisterForm() {
     }
 
     const handleCodeComplete = async (code: string) => {
-        if (!signUp) {
-            toast.error("Sign-up is not available at the moment. Please try again later.");
-            return;
-        };
-
         try {
             const attempt = await signUp.attemptEmailAddressVerification({ code });
 
@@ -85,11 +85,6 @@ function RegisterForm() {
     }
 
     const handleResend = async () => {
-        if (!signUp) {
-            toast.error("Sign-up is not available at the moment. Please try again later.");
-            return;
-        };
-
         try {
             setCodeError(undefined);
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
@@ -99,11 +94,6 @@ function RegisterForm() {
     }
 
     const signUpWith = async (strategy: OAuthStrategy) => {
-        if (!signUp) {
-            toast.error("Sign-up is not available at the moment. Please try again later.");
-            return;
-        };
-
         setSignupLoading(true);
         try {
             await signUp.authenticateWithRedirect({
@@ -123,9 +113,14 @@ function RegisterForm() {
 
     return (
         <>
-            <form className={`p-4 lg:p-6 lg:border-2 ${showDisplayCode && 'hidden'}`} onSubmit={handleSubmit(async (data) => {
+            <motion.form className={`p-4 lg:p-6 lg:border-2 ${showDisplayCode && 'hidden'}`} onSubmit={handleSubmit(async (data) => {
                 await onSubmit(data);
-            })}>
+            })}
+                variants={variants}
+                animate="visible"
+                initial="hidden"
+                noValidate
+            >
                 <FieldGroup>
                     <FieldSet>
                         <FieldLegend><p className="text-xl">Create Account</p></FieldLegend>
@@ -146,7 +141,7 @@ function RegisterForm() {
                                         {...register('firstName')}
                                     />
                                     {errors.firstName && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+                                        <p className="text-red-500 text-sm -mb-2">{errors.firstName.message}</p>
                                     )}
                                 </Field>
                                 <Field className="flex-1">
@@ -161,7 +156,7 @@ function RegisterForm() {
                                         {...register('lastName')}
                                     />
                                     {errors.lastName && (
-                                        <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+                                        <p className="text-red-500 text-sm -mb-2">{errors.lastName.message}</p>
                                     )}
                                 </Field>
                             </div>
@@ -178,7 +173,7 @@ function RegisterForm() {
                                     {...register('email')}
                                 />
                                 {errors.email && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                                    <p className="text-red-500 text-sm -mb-1">{errors.email.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -218,7 +213,7 @@ function RegisterForm() {
                         </Button>
                     </Field>
                 </FieldGroup>
-            </form>
+            </motion.form>
             {showDisplayCode && (
                 <SecondFactorAuth onComplete={(code) => { handleCodeComplete(code) }} email={email} error={codeError} resend={handleResend} />
             )}

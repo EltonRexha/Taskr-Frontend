@@ -11,9 +11,9 @@ import {
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { OAuthStrategy } from '@clerk/types'
-import { SignIn, useSignIn } from "@clerk/nextjs"
+import { useSignIn } from "@clerk/nextjs"
 import { LoginSchema } from "@/schemas/loginSchema"
-import z, { set } from "zod"
+import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
@@ -22,8 +22,15 @@ import { useState } from "react"
 import { SecondFactorAuth } from "../../../../../components/SecondFactor"
 import { toast } from "sonner"
 import PasswordReset from "./PasswordReset"
+import { motion } from "framer-motion"
 
 type FormData = z.infer<typeof LoginSchema>;
+
+const variants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+}
+
 
 function LoginForm() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
@@ -37,12 +44,11 @@ function LoginForm() {
     const [codeError, setCodeError] = useState<string | undefined>(undefined);
     const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
-    const signInWith = async (strategy: OAuthStrategy) => {
-        if (!signIn) {
-            toast.error("Sign-in is not available at the moment. Please try again later.");
-            return;
-        };
+    if (!signIn) {
+        return;
+    };
 
+    const signInWith = async (strategy: OAuthStrategy) => {
         try {
             await signIn.authenticateWithRedirect({
                 strategy,
@@ -56,11 +62,6 @@ function LoginForm() {
     }
 
     const onSubmit = async ({ email, password }: FormData) => {
-        if (!signIn) {
-            toast.error("Sign-in is not available at the moment. Please try again later.");
-            return;
-        };
-
         try {
             const result = await signIn.create({
                 identifier: email,
@@ -87,11 +88,6 @@ function LoginForm() {
     }
 
     const handleSecondFactorResend = async () => {
-        if (!signIn) {
-            toast.error("Sign-in is not available at the moment. Please try again later.");
-            return;
-        };
-
         try {
             await signIn.prepareSecondFactor({
                 strategy: "email_code",
@@ -103,11 +99,6 @@ function LoginForm() {
     }
 
     const handleSecondFactor = async (code: string) => {
-        if (!signIn) {
-            toast.error("Sign-in is not available at the moment. Please try again later.");
-            return;
-        };
-
         try {
             await signIn.attemptSecondFactor({
                 strategy: "email_code",
@@ -131,7 +122,11 @@ function LoginForm() {
 
     return (
         <>
-            <form className={`p-4 lg:p-6 lg:border-2 ${(showSecondFactor || showResetPassword) && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}>
+            <motion.form className={`p-4 lg:p-6 lg:border-2 ${(showSecondFactor || showResetPassword) && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}
+                variants={variants}
+                animate="visible"
+                initial="hidden"
+                noValidate>
                 <FieldGroup>
                     <FieldSet>
                         <FieldLegend><p className="text-xl">Welcome Back!</p></FieldLegend>
@@ -152,7 +147,7 @@ function LoginForm() {
                                     {...register('email')}
                                 />
                                 {errors.email && (
-                                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                                    <p className="text-red-500 text-sm -mb-2">{errors.email.message}</p>
                                 )}
                             </Field>
                             <Field>
@@ -168,7 +163,7 @@ function LoginForm() {
                         </FieldGroup>
                     </FieldSet>
                     {loginError && (
-                        <p className="text-red-500 text-sm mt-1">{loginError}</p>
+                        <p className="text-red-500 text-sm -mb-2">{loginError}</p>
                     )}
                     <div className="flex flex-col gap-1">
                         <Link href="/register" className="text-blue-500 w-fit">Don't have an account?</Link>
@@ -189,7 +184,7 @@ function LoginForm() {
                         </Button>
                     </Field>
                 </FieldGroup>
-            </form>
+            </motion.form>
             {showSecondFactor && (
                 <SecondFactorAuth onComplete={(code) => { handleSecondFactor(code) }} email={email} error={codeError} resend={handleSecondFactorResend} />
             )}

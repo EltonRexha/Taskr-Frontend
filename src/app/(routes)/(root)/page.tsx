@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import DotGrid from "@/components/DotGrid";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 const headerVariants = {
   hidden: { opacity: 0, y: -20 },
@@ -13,30 +14,18 @@ const headerVariants = {
 }
 
 export default function Page() {
-  const { user } = useUser();
-
-  useEffect(() => {
-    if (user) {
-      console.log("User object:", user);
-      console.log("User ID:", user.id);
-      console.log("Email(s):", user.emailAddresses.map(e => e.emailAddress));
-      console.log("Full name:", user.firstName, user.lastName);
-    } else {
-      console.log("No user signed in");
-    }
-  }, [user]);
   const [isHovering, setIsHovering] = useState(false);
 
   return <div className="min-h-screen w-full relative overflow-hidden">
     <div className="fixed inset-0 w-full h-screen -z-10">
       <DotGrid
         dotSize={10}
-        gap={15}
+        gap={20}
         baseColor="#7dbb56"
         activeColor="#6CC24A"
         proximity={120}
-        shockRadius={250}
-        shockStrength={5}
+        shockRadius={150}
+        shockStrength={3}
         resistance={750}
         returnDuration={1.5}
       />
@@ -49,9 +38,8 @@ export default function Page() {
           animate="visible"
           initial="hidden"
           className="text-4xl xl:text-9xl lg:text-8xl md:text-7xl sm:text-5xl lg:mx-12 lg:leading-26 xl:leading-36 mx-4 text-accent-darker font-bold tracking-wide text-center capitalize px-4 scale-y-120 select-none ">open source task management</motion.h1>
-        <motion.a
-          href="/register"
-          className="text-xl lg:text-3xl mt-16 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
+        <motion.div
+
           whileHover={{ scale: 1.01 }}
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -59,14 +47,17 @@ export default function Page() {
           onHoverStart={() => setIsHovering(true)}
           onHoverEnd={() => setIsHovering(false)}
         >
-          Get Started
-          <motion.div
-            animate={{ x: isHovering ? 6 : 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 10 }}
+          <Link href="/register" className="text-xl lg:text-3xl mt-16 inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold transition-colors"
           >
-            <ArrowRight size={20} />
-          </motion.div>
-        </motion.a>
+            Get Started
+            <motion.div
+              animate={{ x: isHovering ? 6 : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 10 }}
+            >
+              <ArrowRight size={20} />
+            </motion.div>
+          </Link>
+        </motion.div>
       </div>
     </div>
   </div>
