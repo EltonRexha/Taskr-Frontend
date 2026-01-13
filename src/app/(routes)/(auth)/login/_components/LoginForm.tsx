@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 'use client'
 import { Button } from "@/components/ui/button"
 import {
@@ -23,6 +24,7 @@ import { SecondFactorAuth } from "../../../../../components/SecondFactor"
 import { toast } from "sonner"
 import PasswordReset from "./PasswordReset"
 import { motion } from "framer-motion"
+import { ClerkError } from "../../../../../../types/ClerkError"
 
 type FormData = z.infer<typeof LoginSchema>;
 
@@ -30,7 +32,6 @@ const variants = {
     hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
 }
-
 
 function LoginForm() {
     const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
@@ -55,6 +56,7 @@ function LoginForm() {
                 redirectUrl: '/',
                 redirectUrlComplete: '/',
             })
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             toast.error("Couldn't sign in with the selected provider. Please try again.");
         }
@@ -78,11 +80,12 @@ function LoginForm() {
                 })
                 setShowSecondFactor(true);
             }
-        } catch (err: any) {
-            if (err.errors[0].code === "strategy_for_user_invalid") {
+        } catch (err: unknown) {
+            const error = err as ClerkError;
+            if (error.errors[0].code === "strategy_for_user_invalid") {
                 setLoginError("Please try to login with your correct provider below.");
             } else {
-                setLoginError(err.errors?.[0]?.longMessage || "An error occurred during sign in. Please try again.");
+                setLoginError(error.errors?.[0]?.longMessage || "An error occurred during sign in. Please try again.");
             }
         }
     }
@@ -92,7 +95,8 @@ function LoginForm() {
             await signIn.prepareSecondFactor({
                 strategy: "email_code",
             })
-        } catch (err: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err: unknown) {
             toast.error("Failed to resend email");
         }
 
@@ -112,7 +116,8 @@ function LoginForm() {
             if (signIn.status !== "complete") {
                 setCodeError("Invalid code. Please try again.");
             }
-        } catch (err: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err: unknown) {
             setCodeError("Invalid code. Please try again.");
         }
 
@@ -122,7 +127,7 @@ function LoginForm() {
 
     return (
         <>
-            <motion.form className={`p-4 lg:p-6 lg:border-2 ${(showSecondFactor || showResetPassword) && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}
+            <motion.form className={`p-4 lg:p-6 lg:border-2 rounded-sm ${(showSecondFactor || showResetPassword) && 'hidden'}`} onSubmit={handleSubmit(onSubmit)}
                 variants={variants}
                 animate="visible"
                 initial="hidden"
@@ -166,7 +171,7 @@ function LoginForm() {
                         <p className="text-red-500 text-sm -mb-2">{loginError}</p>
                     )}
                     <div className="flex flex-col gap-1">
-                        <Link href="/register" className="text-blue-500 w-fit">Don't have an account?</Link>
+                        <Link href="/register" className="text-blue-500 w-fit">Don&apos;t have an account?</Link>
                         <button type="button" className="text-blue-500 w-fit cursor-pointer" onClick={() => setShowResetPassword(true)}>Forgot your password?</button>
                     </div>
                     <Field className="w-full">
