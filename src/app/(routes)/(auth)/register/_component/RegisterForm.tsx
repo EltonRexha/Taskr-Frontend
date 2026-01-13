@@ -23,6 +23,7 @@ import { OAuthStrategy } from '@clerk/types'
 import { toast } from 'sonner';
 import { SecondFactorAuth } from '@/components/SecondFactor';
 import { motion } from 'framer-motion';
+import { ClerkError } from '../../../../../../types/ClerkError';
 
 type FormData = z.infer<typeof UserSchema>;
 
@@ -59,8 +60,9 @@ function RegisterForm() {
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
             setShowDisplayCode(true);
 
-        } catch (err: any) {
-            setError(err.errors?.[0]?.longMessage || "An error occurred during sign up. Please try again.");
+        } catch (err: unknown) {
+            const error = err as ClerkError;
+            setError(error.errors?.[0]?.longMessage || "An error occurred during sign up. Please try again.");
         } finally {
             setSignupLoading(false);
         }
@@ -79,7 +81,8 @@ function RegisterForm() {
                 router.push("/");
             }
 
-        } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err: unknown) {
             setCodeError("An error occurred during verification. Please try again.");
         }
     }
@@ -88,7 +91,8 @@ function RegisterForm() {
         try {
             setCodeError(undefined);
             await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-        } catch (err: any) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err: unknown) {
             setCodeError("Failed to resend verification code. Please try again.");
         }
     }
@@ -101,7 +105,8 @@ function RegisterForm() {
                 redirectUrl: '/',
                 redirectUrlComplete: '/',
             })
-        } catch (err) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err: unknown) {
             toast.error("Couldn't sign in with the selected provider. Please try again.");
         } finally {
             setSignupLoading(false);
@@ -113,7 +118,7 @@ function RegisterForm() {
 
     return (
         <>
-            <motion.form className={`p-4 lg:p-6 lg:border-2 ${showDisplayCode && 'hidden'}`} onSubmit={handleSubmit(async (data) => {
+            <motion.form className={`p-4 lg:p-6 lg:border-2 rounded-sm ${showDisplayCode && 'hidden'}`} onSubmit={handleSubmit(async (data) => {
                 await onSubmit(data);
             })}
                 variants={variants}
