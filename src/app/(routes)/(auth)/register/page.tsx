@@ -1,7 +1,7 @@
 'use client'
 
-import RegisterForm from "./_component/RegisterForm"
-import BackBtn from "./_component/BackBtn"
+import RegisterForm from "../../../../features/auth/components/RegisterForm"
+import BackBtn from "../../../../features/auth/components/BackBtn"
 import { AnimatePresence } from "framer-motion";
 
 function page() {

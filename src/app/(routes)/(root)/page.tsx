@@ -1,10 +1,10 @@
-import { CTA } from "./_components/Cta";
-import { Deploy } from "./_components/Deploy";
-import { Features } from "./_components/Features";
-import { Footer } from "./_components/Footer";
-import { LandingHeader } from "./_components/Header";
-import { Hero } from "./_components/Hero";
-import { OpenSource } from "./_components/OpenSource";
+import { CTA } from "../../../features/home/components/Cta";
+import { Deploy } from "../../../features/home/components/Deploy";
+import { Features } from "../../../features/home/components/Features";
+import { Footer } from "../../../features/home/components/Footer";
+import { LandingHeader } from "../../../features/home/components/Header";
+import { Hero } from "../../../features/home/components/Hero";
+import { OpenSource } from "../../../features/home/components/OpenSource";
 
 export default function Home() {
   return (

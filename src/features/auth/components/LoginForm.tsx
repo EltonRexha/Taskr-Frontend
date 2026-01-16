@@ -13,18 +13,18 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { OAuthStrategy } from '@clerk/types'
 import { useSignIn } from "@clerk/nextjs"
-import { LoginSchema } from "@/schemas/loginSchema"
+import { LoginSchema } from "@/features/auth/schemas/loginSchema"
 import z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import PasswordInput from "@/components/PasswordInput"
 import { useState } from "react"
-import { SecondFactorAuth } from "../../../../../components/SecondFactor"
+import { SecondFactorAuth } from "../../../components/SecondFactor"
 import { toast } from "sonner"
 import PasswordReset from "./PasswordReset"
 import { motion } from "framer-motion"
-import { ClerkError } from "../../../../../../types/ClerkError"
+import { ClerkError } from "../../../types/ClerkError"
 
 type FormData = z.infer<typeof LoginSchema>;
 

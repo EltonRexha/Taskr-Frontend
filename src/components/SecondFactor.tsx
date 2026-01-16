@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import CoolDownBtn from "../app/(routes)/(auth)/register/_component/CoolDownBtn";
+import CoolDownBtn from "../features/auth/components/CoolDownBtn";
 
 interface CodeInputProps {
     length?: number;

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import LoginForm from "./_components/LoginForm"
+import LoginForm from "../../../../features/auth/components/LoginForm"
 
 function page() {
     return (

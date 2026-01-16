@@ -11,7 +11,7 @@ import {
     FieldSet,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { UserSchema } from '@/schemas/userSchema';
+import { UserSchema } from '@/features/auth/schemas/userSchema';
 import z from 'zod';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ import { OAuthStrategy } from '@clerk/types'
 import { toast } from 'sonner';
 import { SecondFactorAuth } from '@/components/SecondFactor';
 import { motion } from 'framer-motion';
-import { ClerkError } from '../../../../../../types/ClerkError';
+import { ClerkError } from '../../../types/ClerkError';
 
 type FormData = z.infer<typeof UserSchema>;
 
