@@ -53,7 +53,7 @@ function LoginForm() {
         try {
             await signIn.authenticateWithRedirect({
                 strategy,
-                redirectUrl: '/',
+                redirectUrl: '/OAuth-callback',
                 redirectUrlComplete: '/',
             })
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
