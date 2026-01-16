@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Github, Terminal, Copy, Check } from "lucide-react"
-import logo from '../../../../../public/logo.png'
+import logo from '../../../../public/logo.png'
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"

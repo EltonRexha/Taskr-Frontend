@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
 import Image from "next/image"
-import logo from '../../../../../public/logo.png'
+import logo from '../../../../public/logo.png'
 
 const links: { name: string, id: string }[] = [
     {
