@@ -54,7 +54,7 @@ export function Deploy() {
         </StaggeredCards>
 
         {/* Deploy options */}
-        <StaggeredCards className="grid gap-4 sm:gap-6 sm:grid-cols-2 mb-12 sm:mx-46">
+        <StaggeredCards className="grid gap-4 sm:gap-6 sm:grid-cols-2 mb-12 lg:mx-46">
           {deployOptions.map((option) => (
             <Card
               key={option.name}
@@ -100,7 +100,7 @@ export function Deploy() {
         </StaggeredCards>
 
         {/* Quick start guide */}
-        <div className="bg-card border border-border rounded-xl p-6 sm:p-8 sm:mx-46">
+        <div className="bg-card border border-border rounded-xl p-6 sm:p-8 lg:mx-46">
           <h3 className="text-lg font-semibold text-foreground mb-6">Quick Start Guide</h3>
           <div className="space-y-4">
             {quickStartSteps.map((step) => (

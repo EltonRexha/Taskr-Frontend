@@ -19,7 +19,7 @@ const benefits = [
     {
         icon: Users,
         title: "Community Driven",
-        description: "Join 350+ contributors shaping the future of open source project management.",
+        description: "contributors shaping the future of open source project management.",
     },
     {
         icon: Globe,
