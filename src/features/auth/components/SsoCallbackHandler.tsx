@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
-function HandleCallback() {
+function SsoCallbackHandler() {
   const { handleRedirectCallback } = useClerk();
   const router = useRouter();
 
@@ -12,12 +12,12 @@ function HandleCallback() {
     async function handleCallback() {
       try {
         await handleRedirectCallback({});
-        router.push("/");
+        router.push("/dashboard");
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         toast.error("Failed to complete authentication. Please try again.");
         setTimeout(() => {
-          router.push("/register");
+          router.push("/dashboard");
         }, 2000);
       }
     }
@@ -35,4 +35,4 @@ function HandleCallback() {
   );
 }
 
-export default HandleCallback;
+export default SsoCallbackHandler;

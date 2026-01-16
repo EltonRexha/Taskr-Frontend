@@ -2,7 +2,6 @@
 import PasswordInput from '@/components/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { useSignIn } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -35,8 +34,6 @@ function ResetPasswordForm() {
             return;
         }
 
-        console.log({ password });
-
         try {
             const result = await signIn.resetPassword({
                 password,
@@ -47,9 +44,10 @@ function ResetPasswordForm() {
                 toast.success("Password has been reset successfully. You can now log in with your new password.");
                 router.push('/')
             }
-        } catch (err: any) {
+        } catch (err) {
+            const clerkError = err as { errors?: { message?: string }[] };
             const message =
-                err?.errors?.[0]?.message ?? "Password does not meet requirements";
+                clerkError?.errors?.[0]?.message ?? "Password does not meet requirements";
             setError(message);
         }
     }

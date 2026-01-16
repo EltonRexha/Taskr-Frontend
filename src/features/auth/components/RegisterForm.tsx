@@ -21,7 +21,7 @@ import { useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { OAuthStrategy } from "@clerk/types";
 import { toast } from "sonner";
-import { SecondFactorAuth } from "@/components/SecondFactor";
+import { SecondFactorAuth } from "@/features/auth/components/SecondFactor";
 import { motion } from "framer-motion";
 import { ClerkError } from "../../../types/ClerkError";
 
@@ -85,7 +85,7 @@ function RegisterForm() {
 
       if (attempt.status === "complete") {
         setActive({ session: attempt.createdSessionId });
-        router.push("/");
+        router.push("/dashboard");
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -109,8 +109,8 @@ function RegisterForm() {
     try {
       await signUp.authenticateWithRedirect({
         strategy,
-        redirectUrl: "/OAuth-callback",
-        redirectUrlComplete: "/",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/dashboard",
       });
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: unknown) {
