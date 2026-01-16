@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { Github } from "lucide-react"
-import Image from "next/image"
 import Logo from "@/components/Logo"
 
 const footerLinks = {

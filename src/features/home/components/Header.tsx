@@ -13,6 +13,7 @@ import {
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useUser } from "@clerk/nextjs";
 import Logo from "@/components/Logo";
+import { motion } from "framer-motion";
 
 const links: { name: string; id: string }[] = [
   {
@@ -40,7 +41,12 @@ export function LandingHeader() {
   if (!isLoaded) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
+    <motion.header
+      className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Logo height={45} width={100} />
 
@@ -146,6 +152,6 @@ export function LandingHeader() {
           </SheetContent>
         </Sheet>
       </div>
-    </header>
+    </motion.header>
   );
 }

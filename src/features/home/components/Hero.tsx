@@ -4,8 +4,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Github, Terminal, Copy, Check } from "lucide-react";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
 import { StaggeredCards } from "@/components/StaggeredCards";
 import { useUser } from "@clerk/nextjs";
 import Logo from "@/components/Logo";
@@ -113,7 +111,7 @@ export function Hero() {
           </div>
         </StaggeredCards>
 
-        <motion.div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-5xl">
           <div className="rounded-xl border border-border bg-card/50 p-3 sm:p-4 shadow-2xl backdrop-blur">
             {/* Window chrome */}
             <div className="flex items-center gap-2 mb-4 sm:mb-6 pb-3 border-b border-border">
@@ -315,7 +313,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </StaggeredCards>
     </section>
   );
