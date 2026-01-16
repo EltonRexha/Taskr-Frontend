@@ -2,7 +2,6 @@
 
 import RegisterForm from "../../../../features/auth/components/RegisterForm"
 import BackBtn from "../../../../features/auth/components/BackBtn"
-import { AnimatePresence } from "framer-motion";
 
 function page() {
 
