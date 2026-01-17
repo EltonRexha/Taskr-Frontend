@@ -1,28 +1,47 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { LayoutDashboard, CheckSquare, Kanban, FolderKanban, Users, Calendar, Search, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { UserDropdown } from "./UserDropdown"
-import Logo from "@/components/Logo"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import {
+  LayoutDashboard,
+  CheckSquare,
+  FolderKanban,
+  Search,
+  Plus,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { UserDropdown } from "./UserDropdown";
+import Logo from "@/components/Logo";
+import { useAuth } from "@clerk/nextjs";
+import { useEffect } from "react";
 
-const projects = [{
+const projects = [
+  {
     id: "1",
     name: "Project 1",
     type: "kanban",
     color: "#FF0000",
-}]
+  },
+];
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/tasks", icon: CheckSquare, label: "My Tasks" },
   { href: "/dashboard/projects", icon: FolderKanban, label: "Projects" },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
+  const { getToken } = useAuth();
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const token = await getToken();
+      console.log(token);
+    };
+    fetchToken();
+  }, [getToken]);
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border hidden lg:block">
@@ -40,7 +59,9 @@ export function Sidebar() {
 
         <nav className="flex-1 space-y-1 px-3">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
             return (
               <Link
@@ -56,13 +77,15 @@ export function Sidebar() {
                 <item.icon className="h-4 w-4" />
                 {item.label}
               </Link>
-            )
+            );
           })}
 
           {/* Projects */}
           <div className="pt-6">
             <div className="flex items-center justify-between px-3 py-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Projects</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Projects
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
@@ -73,8 +96,8 @@ export function Sidebar() {
             </div>
 
             {projects.map((project) => {
-              const isActive = pathname.includes(project.id)
-              const taskCount = project.type === "kanban" ? 6 : 10
+              const isActive = pathname.includes(project.id);
+              const taskCount = project.type === "kanban" ? 6 : 10;
 
               return (
                 <Link
@@ -88,12 +111,17 @@ export function Sidebar() {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: project.color }} />
+                    <div
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: project.color }}
+                    />
                     <span>{project.name}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">{taskCount}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {taskCount}
+                  </span>
                 </Link>
-              )
+              );
             })}
           </div>
         </nav>
@@ -104,5 +132,5 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
-  )
+  );
 }
