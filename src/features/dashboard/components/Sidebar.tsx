@@ -13,17 +13,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "./UserDropdown";
 import Logo from "@/components/Logo";
-import { useAuth } from "@clerk/nextjs";
-import { useEffect } from "react";
-
-const projects = [
-  {
-    id: "1",
-    name: "Project 1",
-    type: "kanban",
-    color: "#FF0000",
-  },
-];
+import { useProjects } from "@/features/projects/hooks/use-projects";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -33,15 +24,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { getToken } = useAuth();
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      const token = await getToken();
-      console.log(token);
-    };
-    fetchToken();
-  }, [getToken]);
+  const projects = useProjects();
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border hidden lg:block">
@@ -95,34 +78,43 @@ export function Sidebar() {
               </Button>
             </div>
 
-            {projects.map((project) => {
-              const isActive = pathname.includes(project.id);
-              const taskCount = project.type === "kanban" ? 6 : 10;
+            {projects.data ? (
+              projects.data.map((project) => {
+                const isActive = pathname.includes(project.id);
+                const taskCount = project.projectType === "kanban" ? 6 : 10;
 
-              return (
-                <Link
-                  key={project.id}
-                  href={`/dashboard/projects/${project.id}`}
-                  className={cn(
-                    "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="h-2 w-2 rounded-full"
-                      style={{ backgroundColor: project.color }}
-                    />
-                    <span>{project.name}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {taskCount}
-                  </span>
-                </Link>
-              );
-            })}
+                return (
+                  <Link
+                    key={project.id}
+                    href={`/dashboard/projects/${project.id}`}
+                    className={cn(
+                      "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-foreground"
+                        : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            project.projectType === "kanban"
+                              ? "#FF0000"
+                              : "#00FF00",
+                        }}
+                      />
+                      <span>{project.name}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {taskCount}
+                    </span>
+                  </Link>
+                );
+              })
+            ) : (
+              <Skeleton className="h-10 w-full" />
+            )}
           </div>
         </nav>
 
