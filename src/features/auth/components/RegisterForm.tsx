@@ -68,7 +68,7 @@ function RegisterForm() {
       const error = err as ClerkError;
       setError(
         error.errors?.[0]?.longMessage ||
-          "An error occurred during sign up. Please try again."
+          "An error occurred during sign up. Please try again.",
       );
     } finally {
       setSignupLoading(false);
@@ -115,7 +115,7 @@ function RegisterForm() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: unknown) {
       toast.error(
-        "Couldn't sign in with the selected provider. Please try again."
+        "Couldn't sign in with the selected provider. Please try again.",
       );
     } finally {
       setSignupLoading(false);

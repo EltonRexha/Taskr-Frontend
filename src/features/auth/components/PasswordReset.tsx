@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z, { set } from "zod";
+import z from "zod";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 const EmailSchema = z.object({
@@ -26,7 +26,7 @@ type EmailFormData = z.infer<typeof EmailSchema>;
 
 function PasswordReset() {
   const [resetCodeError, setResetCodeError] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [showCode, setShowCode] = useState(false);
   const {
@@ -43,7 +43,7 @@ function PasswordReset() {
   const handlePasswordReset = async (code: string) => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
@@ -57,7 +57,7 @@ function PasswordReset() {
       if (result.status === "needs_new_password") {
         setShowResetPasswordForm(true);
       }
-    } catch (err: any) {
+    } catch {
       setResetCodeError("Invalid code. Please try again.");
     }
   };
@@ -65,7 +65,7 @@ function PasswordReset() {
   const handlePasswordResetResend = async () => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
@@ -74,7 +74,7 @@ function PasswordReset() {
         strategy: "reset_password_email_code",
         identifier: email,
       });
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to resend email");
     }
   };
@@ -82,7 +82,7 @@ function PasswordReset() {
   const onSubmit = async (data: EmailFormData) => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
@@ -94,7 +94,7 @@ function PasswordReset() {
         identifier: data.email,
       });
       setShowCode(true);
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to send reset email. Please try again.");
     }
   };

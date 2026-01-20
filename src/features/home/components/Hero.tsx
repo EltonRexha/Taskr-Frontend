@@ -294,10 +294,10 @@ export function Hero() {
                                   task.priority === "Urgent"
                                     ? "bg-red-500/20 text-red-400"
                                     : task.priority === "High"
-                                    ? "bg-orange-500/20 text-orange-400"
-                                    : task.priority === "Medium"
-                                    ? "bg-yellow-500/20 text-yellow-400"
-                                    : "bg-gray-500/20 text-gray-400"
+                                      ? "bg-orange-500/20 text-orange-400"
+                                      : task.priority === "Medium"
+                                        ? "bg-yellow-500/20 text-yellow-400"
+                                        : "bg-gray-500/20 text-gray-400"
                                 }`}
                               >
                                 {task.priority}

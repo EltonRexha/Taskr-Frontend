@@ -1,0 +1,45 @@
+name: Next.js CI
+
+# Trigger workflow on push or pull request to main or development branches
+on:
+  push:
+    branches: [main, development]
+  pull_request:
+    branches: [main, development]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_BACKEND_API_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }}
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: Setup environment variables
+        run: |
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_BACKEND_API_URL=${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }}" >> .env.local
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint code
+        run: npx eslint "src/**/*.{ts,tsx,js,jsx}"
+
+      - name: Prettier check
+        run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
+
+      - name: Build Next.js project
+        run: npm run build

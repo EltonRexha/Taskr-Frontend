@@ -3,12 +3,13 @@ import projectApi from "../api/projects.api";
 
 export const projectQueryKeys = {
   all: ["projects"] as const,
-  list: () => [...projectQueryKeys.all, "list"] as const,
+  list: (projectName?: string) =>
+    [...projectQueryKeys.all, "list", projectName] as const,
 };
 
-export function useProjects() {
+export function useProjects(projectName?: string) {
   return useQuery({
-    queryKey: projectQueryKeys.list(),
-    queryFn: () => projectApi.getProjects(),
+    queryKey: projectQueryKeys.list(projectName),
+    queryFn: () => projectApi.getProjects(projectName),
   });
 }

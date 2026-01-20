@@ -3,31 +3,25 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  CheckSquare,
-  FolderKanban,
-  Search,
-  Plus,
-} from "lucide-react";
+import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "./UserDropdown";
 import Logo from "@/components/Logo";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const navItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/dashboard/tasks", icon: CheckSquare, label: "My Tasks" },
-  { href: "/dashboard/projects", icon: FolderKanban, label: "Projects" },
-];
+import { getActiveDashboardNav } from "../libs/nav-libs";
 
 export function Sidebar() {
   const pathname = usePathname();
   const projects = useProjects();
+  const navItems = getActiveDashboardNav(pathname)?.navItems;
+
+  if (!navItems) {
+    throw new Error("No nav items found for path: " + pathname);
+  }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border hidden lg:block">
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar hidden lg:block">
       <div className="flex h-full flex-col">
         <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-4">
           <Logo width={100} height={32} />

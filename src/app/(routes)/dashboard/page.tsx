@@ -1,9 +1,18 @@
-import React from 'react'
+"use client";
 
-function page() {
+import { DashboardHeader } from "@/features/dashboard/components/Header";
+import { useUser } from "@clerk/nextjs";
+
+function DashboardPage() {
+  const user = useUser();
   return (
-    <div>page</div>
-  )
+    <div className="min-h-screen">
+      <DashboardHeader
+        title="Dashboard"
+        subtitle={`Welcome ${user.user?.firstName}, what would you like to do today?`}
+      />
+    </div>
+  );
 }
 
-export default page
+export default DashboardPage;
