@@ -11,46 +11,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      CLERK_SECRET_KEY: ${{ vars.CLERK_SECRET_KEY }}
-      NEXT_PUBLIC_BACKEND_API_URL: ${{ vars.NEXT_PUBLIC_BACKEND_API_URL }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      NEXT_PUBLIC_BACKEND_API_URL: ${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }}
     defaults:
       run:
         working-directory: ./
 
     steps:
-      # 1. Checkout the repository
       - uses: actions/checkout@v3
-      
-      - name: Log environment variables
-        run: |
-          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}"
-          echo "CLERK_SECRET_KEY=${{ vars.CLERK_SECRET_KEY }}"
-          echo "NEXT_PUBLIC_BACKEND_API_URL=${{ vars.NEXT_PUBLIC_BACKEND_API_URL }}"
-      - name: Setup environment variables
-        run: |
-          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env
-          echo "CLERK_SECRET_KEY=${{ vars.CLERK_SECRET_KEY }}" >> .env
-          echo "NEXT_PUBLIC_BACKEND_API_URL=${{ vars.NEXT_PUBLIC_BACKEND_API_URL }}" >> .env
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
 
-      # 3. Install dependencies using npm ci for reproducibility
+      - name: Setup environment variables
+        run: |
+          echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env.local
+          echo "CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}" >> .env.local
+          echo "NEXT_PUBLIC_BACKEND_API_URL=${{ secrets.NEXT_PUBLIC_BACKEND_API_URL }}" >> .env.local
+
       - name: Install dependencies
         run: npm ci
 
-      # 4. Run ESLint (will fail if console.log exists)
       - name: Lint code
         run: npx eslint "src/**/*.{ts,tsx,js,jsx}"
 
-      # 5. Run Prettier check (fails if code is not formatted)
       - name: Prettier check
         run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
 
-      # 6. Build Next.js project
       - name: Build Next.js project
         run: npm run build
