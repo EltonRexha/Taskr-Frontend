@@ -28,7 +28,7 @@ export function SecondFactorAuth({
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    idx: number
+    idx: number,
   ) => {
     const val = e.target.value.replace(/\D/, "");
     if (!val) return;
@@ -50,7 +50,7 @@ export function SecondFactorAuth({
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    idx: number
+    idx: number,
   ) => {
     if (e.key === "Backspace") {
       e.preventDefault();

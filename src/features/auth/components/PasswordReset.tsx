@@ -26,7 +26,7 @@ type EmailFormData = z.infer<typeof EmailSchema>;
 
 function PasswordReset() {
   const [resetCodeError, setResetCodeError] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [showCode, setShowCode] = useState(false);
   const {
@@ -43,7 +43,7 @@ function PasswordReset() {
   const handlePasswordReset = async (code: string) => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
@@ -65,7 +65,7 @@ function PasswordReset() {
   const handlePasswordResetResend = async () => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
@@ -82,7 +82,7 @@ function PasswordReset() {
   const onSubmit = async (data: EmailFormData) => {
     if (!signIn) {
       toast.error(
-        "Sign-in is not available at the moment. Please try again later."
+        "Sign-in is not available at the moment. Please try again later.",
       );
       return;
     }
