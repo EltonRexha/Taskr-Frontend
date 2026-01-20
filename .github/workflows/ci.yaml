@@ -19,6 +19,9 @@ jobs:
         working-directory: ./
 
     steps:
+      # 1. Checkout the repository
+      - uses: actions/checkout@v3
+      
       - name: Log environment variables
         run: |
           echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}"
@@ -29,9 +32,6 @@ jobs:
           echo "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ vars.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}" >> .env
           echo "CLERK_SECRET_KEY=${{ vars.CLERK_SECRET_KEY }}" >> .env
           echo "NEXT_PUBLIC_BACKEND_API_URL=${{ vars.NEXT_PUBLIC_BACKEND_API_URL }}" >> .env
-
-      # 1. Checkout the repository
-      - uses: actions/checkout@v3
 
       # 2. Setup Node.js
       - name: Setup Node.js
