@@ -1,11 +1,10 @@
 'use client';
 
 import { useState } from 'react'
-import { Field, FieldLabel } from './ui/field'
 import { Input } from './ui/input'
 import { Eye, EyeOff } from 'lucide-react';
 
-function PasswordInput({ error, ...props }: { error?: string;[key: string]: any }) {
+function PasswordInput({ error, ...props }: { error?: string;[key: string]: unknown }) {
     const [showPassword, setShowPassword] = useState(false);
 
     return (

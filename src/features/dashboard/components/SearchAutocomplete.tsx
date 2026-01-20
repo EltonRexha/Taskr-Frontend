@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { useProjects } from "@/features/projects/hooks/use-projects";
+import ProjectIcon from "@/features/projects/components/ProjectIcon";
+import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 
 const priorityColors = {
   low: "bg-gray-500/10 text-gray-400",
@@ -17,18 +20,15 @@ const priorityColors = {
 };
 
 //Mock data
-const projects = [
-  {
-    name: "Project 1",
-    key: "project-1",
-    type: "Software",
-    color: "#FF0000",
-    icon: "🚀",
-    id: "project-1",
-  },
-];
-
-const tasks = [
+const tasks: {
+  title: "Task 1";
+  key: "task-1";
+  projectName: "Project 1";
+  labels: ["Label 1", "Label 2"];
+  priority: "high";
+  dueDate: "2022-01-01";
+  id: "task-1";
+}[] = [
   {
     title: "Task 1",
     key: "task-1",
@@ -43,12 +43,16 @@ const tasks = [
 const recentSearches = ["authentication", "mobile app", "navigation", "sprint"];
 const popularSearches = ["homepage", "API", "dashboard", "settings"];
 
+const PROJECTS_AMOUNT = 2;
+
 export function SearchAutocomplete() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const projects = useProjects(query).data?.slice(0, PROJECTS_AMOUNT);
 
   const filteredTasks =
     query.length > 0
@@ -64,18 +68,7 @@ export function SearchAutocomplete() {
           .slice(0, 5)
       : [];
 
-  const filteredProjects =
-    query.length > 0
-      ? projects
-          .filter(
-            (project) =>
-              project.name.toLowerCase().includes(query.toLowerCase()) ||
-              project.key.toLowerCase().includes(query.toLowerCase()),
-          )
-          .slice(0, 2)
-      : [];
-
-  const totalResults = filteredTasks.length + filteredProjects.length;
+  const totalResults = filteredTasks.length + (projects?.length || 0);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -175,12 +168,12 @@ export function SearchAutocomplete() {
             </div>
           ) : (
             <>
-              {filteredProjects.length > 0 && (
+              {projects && projects.length > 0 && (
                 <div className="p-2 border-b border-border">
                   <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                     Projects
                   </div>
-                  {filteredProjects.map((project, index) => (
+                  {projects.map((project, index) => (
                     <Link
                       key={project.id}
                       href={`/dashboard/projects/${project.id}`}
@@ -196,18 +189,19 @@ export function SearchAutocomplete() {
                       <div
                         className="h-8 w-8 rounded-lg flex items-center justify-center text-sm"
                         style={{
-                          backgroundColor: project.color + "20",
-                          color: project.color,
+                          backgroundColor: getProjectColorByType(
+                            project.projectType,
+                          ),
                         }}
                       >
-                        {project.icon}
+                        <ProjectIcon type={project.projectType} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">
                           {project.name}
                         </p>
                         <p className="text-xs text-muted-foreground capitalize">
-                          {project.type} Project
+                          {project.projectType} Project
                         </p>
                       </div>
                       <ArrowRight className="h-4 w-4 text-muted-foreground" />
@@ -230,7 +224,8 @@ export function SearchAutocomplete() {
                       }}
                       className={cn(
                         "flex items-center gap-3 px-2 py-2 rounded-md hover:bg-secondary/50 transition-colors",
-                        selectedIndex === filteredProjects.length + index &&
+                        selectedIndex ===
+                          (projects ? projects : []).length + index &&
                           "bg-secondary/50",
                       )}
                     >

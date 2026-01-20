@@ -18,6 +18,7 @@ import { Project } from "@/features/projects/types/projects.types";
 import Logo from "@/components/Logo";
 import { NavItems } from "../types/nav-items.types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 
 interface MobileSidebarProps {
   projects: Project[];
@@ -123,10 +124,9 @@ export function MobileSidebar({ projects, navItems }: MobileSidebarProps) {
                       <div
                         className="h-2 w-2 rounded-full"
                         style={{
-                          backgroundColor:
-                            project.projectType === "kanban"
-                              ? "#FF0000"
-                              : "#00FF00",
+                          backgroundColor: getProjectColorByType(
+                            project.projectType,
+                          ),
                         }}
                       />
                       <span>{project.name}</span>

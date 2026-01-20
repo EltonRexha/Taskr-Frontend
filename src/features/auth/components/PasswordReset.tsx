@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z, { set } from "zod";
+import z from "zod";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 const EmailSchema = z.object({
@@ -57,7 +57,7 @@ function PasswordReset() {
       if (result.status === "needs_new_password") {
         setShowResetPasswordForm(true);
       }
-    } catch (err: any) {
+    } catch {
       setResetCodeError("Invalid code. Please try again.");
     }
   };
@@ -74,7 +74,7 @@ function PasswordReset() {
         strategy: "reset_password_email_code",
         identifier: email,
       });
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to resend email");
     }
   };
@@ -94,7 +94,7 @@ function PasswordReset() {
         identifier: data.email,
       });
       setShowCode(true);
-    } catch (err: any) {
+    } catch {
       toast.error("Failed to send reset email. Please try again.");
     }
   };

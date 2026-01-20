@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { routes } from "./lib/routes";
+import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(routes.PROTECTED);
 const isGuestRoute = createRouteMatcher(routes.GUEST);
@@ -9,12 +10,15 @@ export default clerkMiddleware(async (auth, req) => {
 
   //The user is authenticated but trying to access a guest route
   if (isGuestRoute(req) && userId) {
-    return Response.redirect(new URL("/dashboard", req.url));
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (isProtectedRoute(req) && !userId) {
-    await auth.protect();
+    console.log("User is not authenticated");
+    return NextResponse.redirect(new URL("/login", req.url));
   }
+
+  return NextResponse.next();
 });
 
 export const config = {
