@@ -11,7 +11,8 @@ const tasksQueryKeys = {
     projectName?: string;
     projectId?: string;
     description?: string;
-  }) => [tasksQueryKeys.all, "list", projectName, projectId, description] as const,
+  }) =>
+    [tasksQueryKeys.all, "list", projectName, projectId, description] as const,
 };
 
 export const useTasks = ({
