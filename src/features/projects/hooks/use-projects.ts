@@ -7,9 +7,9 @@ export const projectQueryKeys = {
     [...projectQueryKeys.all, "list", projectName] as const,
 };
 
-export function useProjects(projectName?: string) {
+export function useProjects({ projectName }: { projectName?: string }) {
   return useQuery({
     queryKey: projectQueryKeys.list(projectName),
-    queryFn: () => projectApi.getProjects(projectName),
+    queryFn: () => projectApi.getProjects({ projectName }),
   });
 }

@@ -10,14 +10,20 @@ import Logo from "@/components/Logo";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getActiveDashboardNav } from "../libs/nav-libs";
+import { toast } from "sonner";
 
 export function Sidebar() {
   const pathname = usePathname();
-  const projects = useProjects();
+  const { data, error } = useProjects({});
   const navItems = getActiveDashboardNav(pathname)?.navItems;
+  const projects = data?.projects;
 
   if (!navItems) {
     throw new Error("No nav items found for path: " + pathname);
+  }
+
+  if (error) {
+    toast.error("Error fetching projects:");
   }
 
   return (
@@ -72,8 +78,8 @@ export function Sidebar() {
               </Button>
             </div>
 
-            {projects.data ? (
-              projects.data.map((project) => {
+            {projects ? (
+              projects.map((project) => {
                 const isActive = pathname.includes(project.id);
                 const taskCount = project.projectType === "kanban" ? 6 : 10;
 

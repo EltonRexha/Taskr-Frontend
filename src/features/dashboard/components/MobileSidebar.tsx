@@ -14,14 +14,14 @@ import {
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
 import { UserDropdown } from "./UserDropdown";
-import { Project } from "@/features/projects/types/projects.types";
 import Logo from "@/components/Logo";
 import { NavItems } from "../types/nav-items.types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
+import { ProjectDto } from "@/features/projects/types/projects.types";
 
 interface MobileSidebarProps {
-  projects: Project[];
+  projects: ProjectDto[];
   navItems: NavItems;
 }
 

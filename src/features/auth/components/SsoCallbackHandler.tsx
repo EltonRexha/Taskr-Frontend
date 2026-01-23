@@ -11,10 +11,11 @@ function SsoCallbackHandler() {
   useEffect(() => {
     async function handleCallback() {
       try {
-        await handleRedirectCallback({});
-        router.push("/dashboard");
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
+        await handleRedirectCallback({
+          signInForceRedirectUrl: "/dashboard",
+          signUpForceRedirectUrl: "/dashboard",
+        });
+      } catch {
         toast.error("Failed to complete authentication. Please try again.");
         setTimeout(() => {
           router.push("/dashboard");
