@@ -87,9 +87,7 @@ function RegisterForm() {
         setActive({ session: attempt.createdSessionId });
         router.push("/dashboard");
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err: unknown) {
+    } catch {
       setCodeError("An error occurred during verification. Please try again.");
     }
   };
@@ -98,8 +96,7 @@ function RegisterForm() {
     try {
       setCodeError(undefined);
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err: unknown) {
+    } catch {
       setCodeError("Failed to resend verification code. Please try again.");
     }
   };
@@ -112,8 +109,7 @@ function RegisterForm() {
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/dashboard",
       });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err: unknown) {
+    } catch {
       toast.error(
         "Couldn't sign in with the selected provider. Please try again.",
       );

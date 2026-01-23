@@ -1,14 +1,14 @@
 import api from "@/lib/axios";
-import { Project } from "../types/projects.types";
+import { ProjectsResponse } from "../types/projects.types";
 
 const projectApi = {
-  getProjects: async (projectName?: string) => {
-    const response = await api.get<{ projects: Project[] }>("/projects", {
+  getProjects: async ({ projectName }: { projectName?: string }) => {
+    const response = await api.get<ProjectsResponse>("/projects", {
       params: {
         project_name: projectName,
       },
     });
-    return response.data.projects;
+    return response.data;
   },
 };
 

@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useRef, useEffect } from "react";
 import { Search, ArrowRight, Clock, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -11,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import ProjectIcon from "@/features/projects/components/ProjectIcon";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { useDebounce, useLocalStorage } from "@uidotdev/usehooks";
 
 const priorityColors = {
   low: "bg-gray-500/10 text-gray-400",
@@ -19,56 +20,64 @@ const priorityColors = {
   urgent: "bg-red-500/10 text-red-500",
 };
 
-//Mock data
-const tasks: {
-  title: "Task 1";
-  key: "task-1";
-  projectName: "Project 1";
-  labels: ["Label 1", "Label 2"];
-  priority: "high";
-  dueDate: "2022-01-01";
-  id: "task-1";
-}[] = [
-  {
-    title: "Task 1",
-    key: "task-1",
-    projectName: "Project 1",
-    labels: ["Label 1", "Label 2"],
-    priority: "high",
-    dueDate: "2022-01-01",
-    id: "task-1",
-  },
-];
-
-const recentSearches = ["authentication", "mobile app", "navigation", "sprint"];
 const popularSearches = ["homepage", "API", "dashboard", "settings"];
 
 const PROJECTS_AMOUNT = 2;
+const TASKS_AMOUNT = 2;
 
 export function SearchAutocomplete() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const debouncedQuery = useDebounce(query, 500);
+  const [recentSearches, saveRecentSearches] = useLocalStorage<string[]>(
+    "recentSearches",
+    [],
+  );
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const projects = useProjects(query).data?.slice(0, PROJECTS_AMOUNT);
+  const { data: projectsData, isLoading: projectsLoading } = useProjects({
+    projectName: debouncedQuery,
+  });
+  const projects = projectsData?.projects.slice(0, PROJECTS_AMOUNT);
 
-  const filteredTasks =
-    query.length > 0
-      ? tasks
-          .filter(
-            (task) =>
-              task.title.toLowerCase().includes(query.toLowerCase()) ||
-              task.key.toLowerCase().includes(query.toLowerCase()) ||
-              task.labels.some((label) =>
-                label.toLowerCase().includes(query.toLowerCase()),
-              ),
-          )
-          .slice(0, 5)
-      : [];
+  //Search tasks with the task description
+  const { data: descriptionTaskData, isLoading: descriptionTaskLoading } =
+    useTasks({
+      description: debouncedQuery,
+    });
 
-  const totalResults = filteredTasks.length + (projects?.length || 0);
+  //Search tasks with the project name
+  const { data: projectTasksData, isLoading: projectTasksLoading } = useTasks({
+    projectName: debouncedQuery,
+  });
+
+  const descriptionMatchedTasks = descriptionTaskData?.tasks.slice(
+    0,
+    TASKS_AMOUNT,
+  );
+  const projectTasks = projectTasksData?.tasks.slice(0, TASKS_AMOUNT);
+
+  const tasks = Array.from(
+    new Map(
+      [...(descriptionMatchedTasks ?? []), ...(projectTasks ?? [])].map(
+        (task) => [task.id, task],
+      ),
+    ).values(),
+  );
+
+  const loading =
+    descriptionTaskLoading || projectTasksLoading || projectsLoading;
+
+  const totalResults = (tasks?.length || 0) + (projects?.length || 0);
+
+  useEffect(() => {
+    saveRecentSearches([
+      ...(tasks?.map((task) => task.description) || []),
+      ...(projects?.map((project) => project.name) || []),
+    ]);
+  }, [tasks, projects, saveRecentSearches]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -119,7 +128,7 @@ export function SearchAutocomplete() {
           ref={dropdownRef}
           className="absolute top-full left-0 right-0 mt-2 rounded-lg border border-border bg-card shadow-xl z-50 overflow-hidden"
         >
-          {query.length === 0 ? (
+          {debouncedQuery.length === 0 ? (
             <div className="p-3">
               <div className="mb-3">
                 <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground mb-2">
@@ -162,9 +171,13 @@ export function SearchAutocomplete() {
                 </div>
               </div>
             </div>
+          ) : loading ? (
+            <div className="p-4 text-center text-sm text-muted-foreground">
+              Loading...
+            </div>
           ) : totalResults === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              No results found for {query}
+              No results found for {debouncedQuery}
             </div>
           ) : (
             <>
@@ -209,12 +222,12 @@ export function SearchAutocomplete() {
                   ))}
                 </div>
               )}
-              {filteredTasks.length > 0 && (
+              {tasks && tasks.length > 0 && (
                 <div className="p-2">
                   <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
                     Tasks
                   </div>
-                  {filteredTasks.map((task, index) => (
+                  {tasks.map((task, index) => (
                     <Link
                       key={task.id}
                       href={`/dashboard/tasks?task=${task.id}`}
@@ -232,14 +245,14 @@ export function SearchAutocomplete() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground font-mono">
-                            {task.key}
+                            {task.label}
                           </span>
                           <p className="text-sm font-medium text-foreground truncate">
-                            {task.title}
+                            {task.description}
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          {task.projectName}
+                          {task.project.name}
                         </p>
                       </div>
                       <Badge
@@ -247,7 +260,7 @@ export function SearchAutocomplete() {
                         className={cn(
                           "text-[10px]",
                           priorityColors[
-                            task.priority as keyof typeof priorityColors
+                            task.priority.toLowerCase() as keyof typeof priorityColors
                           ],
                         )}
                       >

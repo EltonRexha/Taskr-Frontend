@@ -15,21 +15,22 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
   const pathname = usePathname();
-  const projects = useProjects();
+  const { data, error: projectsError } = useProjects({});
   const activeNav = getActiveDashboardNav(pathname)?.navItems;
+  const projects = data?.projects;
 
   if (!activeNav) {
     throw new Error("No nav items found for path: " + pathname);
   }
 
-  if (projects.error) {
+  if (projectsError) {
     toast.error("Failed to load projects");
   }
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/95 px-4 py-3 sm:px-6 lg:px-8 min-h-18">
       <div className="flex items-center gap-3">
-        <MobileSidebar navItems={activeNav} projects={projects.data || []} />
+        <MobileSidebar navItems={activeNav} projects={projects || []} />
         <div>
           <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
             {title}
