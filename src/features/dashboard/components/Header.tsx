@@ -7,6 +7,7 @@ import { useProjects } from "@/features/projects/hooks/use-projects";
 import { toast } from "sonner";
 import { NotificationsDropdown } from "./NotificationDropdown";
 import { SearchAutocomplete } from "./SearchAutocomplete";
+import { useIsClient } from "@uidotdev/usehooks";
 
 interface DashboardHeaderProps {
   title: string;
@@ -16,8 +17,13 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
   const pathname = usePathname();
   const { data, error: projectsError } = useProjects({});
+  const isClient = useIsClient();
   const activeNav = getActiveDashboardNav(pathname)?.navItems;
   const projects = data?.projects;
+
+  if (!isClient) {
+    return null;
+  }
 
   if (!activeNav) {
     throw new Error("No nav items found for path: " + pathname);
