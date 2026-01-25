@@ -14,7 +14,6 @@ function Logo({ height, width }: { height: number; width: number }) {
 
   return (
     <Link href="/" className="flex items-center gap-2">
-      {/* If its dark theme use the light logo, else use the dark logo */}
       <Image
         src={isDark.theme === "dark" ? logo : logoDark}
         alt="logo"

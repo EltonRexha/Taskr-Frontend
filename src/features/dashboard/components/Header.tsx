@@ -6,24 +6,19 @@ import { getActiveDashboardNav } from "../libs/nav-libs";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import { toast } from "sonner";
 import { NotificationsDropdown } from "./NotificationDropdown";
-import { SearchAutocomplete } from "./SearchAutocomplete";
-import { useIsClient } from "@uidotdev/usehooks";
+import HeaderSearch from "./HeaderSearch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DashboardHeaderProps {
   title: string;
-  subtitle?: string;
+  firstName?: string;
 }
 
-export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
+export function DashboardHeader({ title, firstName }: DashboardHeaderProps) {
   const pathname = usePathname();
   const { data, error: projectsError } = useProjects({});
-  const isClient = useIsClient();
   const activeNav = getActiveDashboardNav(pathname)?.navItems;
   const projects = data?.projects;
-
-  if (!isClient) {
-    return null;
-  }
 
   if (!activeNav) {
     throw new Error("No nav items found for path: " + pathname);
@@ -41,15 +36,17 @@ export function DashboardHeader({ title, subtitle }: DashboardHeaderProps) {
           <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
             {title}
           </h1>
-          {subtitle && (
+          {firstName ? (
             <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">
-              {subtitle}
+              Welcome {firstName}, what would you like to do today?
             </p>
+          ) : (
+            <Skeleton className="h-4 w-64 md:w-84 mt-1" />
           )}
         </div>
       </div>
       <div className="flex items-center gap-2 sm:gap-4">
-        <SearchAutocomplete />
+        <HeaderSearch />
         <NotificationsDropdown />
       </div>
     </header>

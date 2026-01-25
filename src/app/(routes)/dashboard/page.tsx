@@ -1,6 +1,7 @@
 "use client";
 
 import { DashboardHeader } from "@/features/dashboard/components/Header";
+import { StatsCards } from "@/features/dashboard/components/StatsCards";
 import { useUser } from "@clerk/nextjs";
 
 function DashboardPage() {
@@ -9,8 +10,11 @@ function DashboardPage() {
     <div className="min-h-screen">
       <DashboardHeader
         title="Dashboard"
-        subtitle={`Welcome ${user.user?.firstName}, what would you like to do today?`}
+        firstName={user.user?.firstName || ""}
       />
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 max-w-324">
+        <StatsCards />
+      </div>
     </div>
   );
 }

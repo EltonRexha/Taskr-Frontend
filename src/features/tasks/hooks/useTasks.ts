@@ -7,25 +7,40 @@ const tasksQueryKeys = {
     projectName,
     projectId,
     description,
+    startDate,
+    startDateGte,
   }: {
     projectName?: string;
     projectId?: string;
     description?: string;
+    startDate?: string;
+    startDateGte?: string;
   }) =>
-    [tasksQueryKeys.all, "list", projectName, projectId, description] as const,
+    [
+      tasksQueryKeys.all,
+      "list",
+      projectName,
+      projectId,
+      description,
+      startDate,
+      ] as const,
 };
 
 export const useTasks = ({
   projectName,
   projectId,
   description,
+  startDate,
+  startDateGte,
 }: {
   projectName?: string;
   projectId?: string;
   description?: string;
+  startDate?: string;
+  startDateGte?: string;
 }) => {
   return useQuery({
-    queryKey: tasksQueryKeys.list({ projectName, projectId, description }),
-    queryFn: () => taskApi.getTasks({ projectName, projectId, description }),
+    queryKey: tasksQueryKeys.list({ projectName, projectId, description, startDate, startDateGte }),
+    queryFn: () => taskApi.getTasks({ projectName, projectId, description, startDate, startDateGte }),
   });
 };
