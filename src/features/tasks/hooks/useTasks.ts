@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { taskApi } from "../api/tasks.api";
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE } from "@/lib/constants";
+import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
 
 const tasksQueryKeys = {
   all: ["tasks"] as const,
@@ -7,25 +9,72 @@ const tasksQueryKeys = {
     projectName,
     projectId,
     description,
-  }: {
-    projectName?: string;
-    projectId?: string;
-    description?: string;
-  }) =>
-    [tasksQueryKeys.all, "list", projectName, projectId, description] as const,
+    limit,
+    page,
+    startDate,
+    startDateGte,
+    dueDate,
+    dueDateLte,
+    status,
+    type,
+  }: TaskQueryParams) =>
+    [
+      tasksQueryKeys.all,
+      "list",
+      projectName,
+      projectId,
+      description,
+      limit,
+      page,
+      startDate,
+      startDateGte,
+      dueDate,
+      dueDateLte,
+      status,
+      type,
+    ] as const,
 };
 
 export const useTasks = ({
   projectName,
   projectId,
   description,
-}: {
-  projectName?: string;
-  projectId?: string;
-  description?: string;
-}) => {
+  limit = DEFAULT_PAGE_SIZE,
+  page = DEFAULT_PAGE,
+  status,
+  type,
+  startDate,
+  startDateGte,
+  dueDate,
+  dueDateLte,
+}: TaskQueryParams): UseQueryResult<TasksResponse, Error> => {
   return useQuery({
-    queryKey: tasksQueryKeys.list({ projectName, projectId, description }),
-    queryFn: () => taskApi.getTasks({ projectName, projectId, description }),
+    queryKey: tasksQueryKeys.list({
+      projectName,
+      projectId,
+      description,
+      limit,
+      page,
+      startDate,
+      startDateGte,
+      dueDate,
+      dueDateLte,
+      status,
+      type,
+    }),
+    queryFn: () =>
+      taskApi.getTasks({
+        projectName,
+        projectId,
+        description,
+        startDate,
+        startDateGte,
+        dueDate,
+        dueDateLte,
+        limit,
+        page,
+        status,
+        type,
+      }),
   });
 };
