@@ -1,470 +1,191 @@
+import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { CheckCircle2, Circle, Clock, AlertTriangle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TaskDto } from "@/features/tasks/types/tasks.types";
+import { getWeekRange } from "@/lib/date";
+import { format } from "date-fns";
 
-export const users = [
-  {
-    id: "1",
-    name: "Alex Chen",
-    email: "alex@taskr.io",
-    role: "Product Manager",
-  },
-  {
-    id: "2",
-    name: "Sarah Kim",
-    email: "sarah@taskr.io",
-    role: "Senior Developer",
-  },
-  {
-    id: "3",
-    name: "Mike Johnson",
-    email: "mike@taskr.io",
-    role: "UX Designer",
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@taskr.io",
-    role: "Frontend Developer",
-  },
-  {
-    id: "5",
-    name: "James Wilson",
-    email: "james@taskr.io",
-    role: "Backend Developer",
-  },
-];
+const TASK_LIMIT = 50;
 
-const tasks = [
-  // Kanban project tasks
-  {
-    id: "task-1",
-    key: "MKT-1",
-    title: "Redesign homepage hero section",
-    description: "Update the hero section with new branding and messaging",
-    status: "done",
-    priority: "high",
-    assignee: users[2],
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    dueDate: "2026-01-10",
-    createdAt: "2025-12-20",
-    updatedAt: "2026-01-08",
-    labels: ["design", "urgent"],
-    comments: [],
-    subtasks: [
-      { id: "st-1", title: "Create wireframes", completed: true },
-      { id: "st-2", title: "Design mockups", completed: true },
-      { id: "st-3", title: "Get stakeholder approval", completed: true },
-    ],
-    timeTracked: 480,
-    timeEstimate: 360,
-  },
-  {
-    id: "task-2",
-    key: "MKT-2",
-    title: "Implement new navigation menu",
-    description: "Build responsive navigation with mega menu support",
-    status: "in-progress",
-    priority: "medium",
-    assignee: users[3],
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    dueDate: "2026-01-15",
-    createdAt: "2025-12-22",
-    updatedAt: "2026-01-12",
-    labels: ["frontend", "navigation"],
-    comments: [
-      {
-        id: "c-1",
-        author: users[0],
-        content: "Make sure to test on mobile devices",
-        createdAt: "2026-01-10T10:30:00Z",
-      },
-    ],
-    subtasks: [
-      { id: "st-4", title: "Desktop navigation", completed: true },
-      { id: "st-5", title: "Mobile menu", completed: false },
-      { id: "st-6", title: "Mega menu dropdowns", completed: false },
-    ],
-    timeTracked: 240,
-    timeEstimate: 480,
-  },
-  {
-    id: "task-3",
-    key: "MKT-3",
-    title: "SEO optimization audit",
-    description: "Conduct full SEO audit and implement improvements",
-    status: "todo",
-    priority: "medium",
-    assignee: null,
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    dueDate: "2026-01-20",
-    createdAt: "2026-01-05",
-    updatedAt: "2026-01-05",
-    labels: ["seo", "marketing"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 600,
-  },
-  {
-    id: "task-4",
-    key: "MKT-4",
-    title: "Create blog post template",
-    description: "Design and implement reusable blog post template",
-    status: "review",
-    priority: "low",
-    assignee: users[2],
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    dueDate: "2026-01-18",
-    createdAt: "2026-01-02",
-    updatedAt: "2026-01-11",
-    labels: ["design", "content"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 180,
-    timeEstimate: 240,
-  },
-  {
-    id: "task-5",
-    key: "MKT-5",
-    title: "Performance optimization",
-    description: "Improve page load times and Core Web Vitals",
-    status: "backlog",
-    priority: "high",
-    assignee: null,
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    labels: ["performance", "technical"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 720,
-    createdAt: "2026-01-08",
-    updatedAt: "2026-01-08",
-  },
-  {
-    id: "task-6",
-    key: "MKT-6",
-    title: "Update footer links",
-    description: "Add new product pages to footer navigation",
-    status: "todo",
-    priority: "low",
-    assignee: users[3],
-    reporter: users[0],
-    projectId: "kanban-1",
-    projectName: "Marketing Site",
-    dueDate: "2026-01-16",
-    createdAt: "2026-01-10",
-    updatedAt: "2026-01-10",
-    labels: ["frontend"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 60,
-  },
-  // Scrum project tasks
-  {
-    id: "task-7",
-    key: "MOB-1",
-    title: "Set up React Native project",
-    description:
-      "Initialize project with TypeScript and essential dependencies",
-    status: "done",
-    priority: "high",
-    assignee: users[1],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-1",
-    storyPoints: 3,
-    createdAt: "2025-11-28",
-    updatedAt: "2025-12-05",
-    labels: ["setup", "infrastructure"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 240,
-    timeEstimate: 240,
-  },
-  {
-    id: "task-8",
-    key: "MOB-2",
-    title: "Implement user authentication",
-    description: "Build login, registration, and password reset flows",
-    status: "done",
-    priority: "high",
-    assignee: users[4],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-1",
-    storyPoints: 8,
-    createdAt: "2025-11-28",
-    updatedAt: "2025-12-12",
-    labels: ["auth", "security"],
-    comments: [],
-    subtasks: [
-      { id: "st-7", title: "Login screen UI", completed: true },
-      { id: "st-8", title: "Registration flow", completed: true },
-      { id: "st-9", title: "Password reset", completed: true },
-      { id: "st-10", title: "Biometric auth", completed: true },
-    ],
-    timeTracked: 960,
-    timeEstimate: 960,
-  },
-  {
-    id: "task-9",
-    key: "MOB-3",
-    title: "Design app navigation structure",
-    description: "Create bottom tab navigation and stack navigators",
-    status: "done",
-    priority: "medium",
-    assignee: users[3],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-2",
-    storyPoints: 5,
-    createdAt: "2025-12-14",
-    updatedAt: "2025-12-22",
-    labels: ["navigation", "ux"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 480,
-    timeEstimate: 480,
-  },
-  {
-    id: "task-10",
-    key: "MOB-4",
-    title: "Build home screen dashboard",
-    description: "Create dashboard with key metrics and quick actions",
-    status: "done",
-    priority: "high",
-    assignee: users[3],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-2",
-    storyPoints: 8,
-    createdAt: "2025-12-14",
-    updatedAt: "2025-12-26",
-    labels: ["ui", "dashboard"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 720,
-    timeEstimate: 720,
-  },
-  {
-    id: "task-11",
-    key: "MOB-5",
-    title: "Implement user profile screen",
-    description: "Build profile view and edit functionality",
-    status: "in-progress",
-    priority: "high",
-    assignee: users[3],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-3",
-    storyPoints: 5,
-    createdAt: "2025-12-30",
-    updatedAt: "2026-01-10",
-    labels: ["ui", "profile"],
-    comments: [],
-    subtasks: [
-      { id: "st-11", title: "Profile view screen", completed: true },
-      { id: "st-12", title: "Edit profile form", completed: false },
-      { id: "st-13", title: "Avatar upload", completed: false },
-    ],
-    timeTracked: 360,
-    timeEstimate: 480,
-  },
-  {
-    id: "task-12",
-    key: "MOB-6",
-    title: "Create settings screen",
-    description:
-      "Build app settings with notifications, privacy, and preferences",
-    status: "todo",
-    priority: "medium",
-    assignee: users[4],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-3",
-    storyPoints: 5,
-    createdAt: "2025-12-30",
-    updatedAt: "2025-12-30",
-    labels: ["settings", "preferences"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 480,
-  },
-  {
-    id: "task-13",
-    key: "MOB-7",
-    title: "Implement dark mode",
-    description: "Add theme switching with system preference detection",
-    status: "review",
-    priority: "medium",
-    assignee: users[3],
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    sprintId: "sprint-3",
-    storyPoints: 3,
-    createdAt: "2025-12-30",
-    updatedAt: "2026-01-12",
-    labels: ["ui", "theme"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 300,
-    timeEstimate: 240,
-  },
-  // Backlog items (not in any sprint)
-  {
-    id: "task-14",
-    key: "MOB-8",
-    title: "Push notification system",
-    description: "Implement push notifications with Firebase Cloud Messaging",
-    status: "backlog",
-    priority: "high",
-    assignee: null,
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    storyPoints: 8,
-    createdAt: "2026-01-05",
-    updatedAt: "2026-01-05",
-    labels: ["notifications", "firebase"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 960,
-  },
-  {
-    id: "task-15",
-    key: "MOB-9",
-    title: "Offline mode support",
-    description: "Enable app functionality without internet connection",
-    status: "backlog",
-    priority: "medium",
-    assignee: null,
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    storyPoints: 13,
-    createdAt: "2026-01-05",
-    updatedAt: "2026-01-05",
-    labels: ["offline", "sync"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 1200,
-  },
-  {
-    id: "task-16",
-    key: "MOB-10",
-    title: "Analytics integration",
-    description: "Add event tracking and user analytics",
-    status: "backlog",
-    priority: "low",
-    assignee: null,
-    reporter: users[1],
-    projectId: "scrum-1",
-    projectName: "Mobile App",
-    storyPoints: 5,
-    createdAt: "2026-01-08",
-    updatedAt: "2026-01-08",
-    labels: ["analytics"],
-    comments: [],
-    subtasks: [],
-    timeTracked: 0,
-    timeEstimate: 480,
-  },
-];
+function getTaskStatus(task: TaskDto): string | null {
+  return task.metaData.status;
+}
 
-export function getDashboardStats() {
-  const total = tasks.length;
-  const inProgress = tasks.filter((t) => t.status === "in-progress").length;
-  const completed = tasks.filter((t) => t.status === "done").length;
-  const overdue = tasks.filter((t) => {
-    if (!t.dueDate) return false;
-    return new Date(t.dueDate) < new Date() && t.status !== "done";
-  }).length;
+function isTaskCompleted(task: TaskDto): boolean {
+  const status = getTaskStatus(task);
+  return status === "DONE";
+}
 
-  return { total, inProgress, completed, overdue };
+function isTaskInProgress(task: TaskDto): boolean {
+  const status = getTaskStatus(task);
+  return status === "IN_PROGRESS";
+}
+
+function useTaskStats(tasks: TaskDto[]) {
+  const completed = tasks.filter(isTaskCompleted).length;
+  const inProgress = tasks.filter(isTaskInProgress).length;
+
+  return {
+    completed,
+    inProgress,
+  };
+}
+
+function useDashboardStats() {
+  const { endDate: lastWeekEnd, startDate: lastWeekStart } = getWeekRange(1);
+  const { startDate: thisWeekStart } = getWeekRange();
+  const lastWeekTasks = useTasks({
+    dueDateLte: lastWeekEnd,
+    startDateGte: lastWeekStart,
+    limit: TASK_LIMIT,
+  });
+  const thisWeekTasks = useTasks({
+    startDateGte: thisWeekStart,
+    limit: TASK_LIMIT,
+  });
+
+  const thisWeekData = thisWeekTasks.data?.tasks || [];
+  const lastWeekData = lastWeekTasks.data?.tasks || [];
+
+  console.log({ thisWeekData, lastWeekData });
+
+  const total = thisWeekData.length;
+  const taskStats = useTaskStats(thisWeekData);
+
+  const lastWeekTotal = lastWeekData.length;
+  const lastWeekTaskStats = useTaskStats(lastWeekData);
+
+  const totalChange = Number(
+    lastWeekTotal > 0
+      ? (((total - lastWeekTotal) / lastWeekTotal) * 100).toFixed(0)
+      : 0,
+  );
+  const completedChange = Number(
+    lastWeekTaskStats.completed > 0
+      ? (
+          ((taskStats.completed - lastWeekTaskStats.completed) /
+            lastWeekTaskStats.completed) *
+          100
+        ).toFixed(0)
+      : taskStats.completed > 0
+        ? 100
+        : 0,
+  );
+  const inProgressChange = Number(
+    lastWeekTaskStats.inProgress > 0
+      ? (
+          ((taskStats.inProgress - lastWeekTaskStats.inProgress) /
+            lastWeekTaskStats.inProgress) *
+          100
+        ).toFixed(0)
+      : taskStats.inProgress > 0
+        ? 100
+        : 0,
+  );
+
+  const overDueTasks = useTasks({
+    dueDateLte: format(new Date(), "yyyy-MM-dd"),
+  });
+
+  return {
+    total,
+    inProgress: taskStats.inProgress,
+    completed: taskStats.completed,
+    totalChange: totalChange >= 0 ? `+${totalChange}%` : `${totalChange}%`,
+    completedChange:
+      completedChange >= 0 ? `+${completedChange}%` : `${completedChange}%`,
+    inProgressChange:
+      inProgressChange >= 0 ? `+${inProgressChange}%` : `${inProgressChange}%`,
+    isLoading: thisWeekTasks.isLoading || lastWeekTasks.isLoading,
+    totalOverdue: overDueTasks.data?.tasks.length || 0,
+  };
 }
 
 export function StatsCards() {
-  const stats = getDashboardStats();
+  const stats = useDashboardStats();
   const cards = [
     {
-      label: "Total Tasks",
+      label: "Total Tasks This Week",
       value: stats.total,
-      change: "+12% from last week",
-      changeType: "positive" as const,
+      change: `${stats.totalChange} from last week`,
+      changeType: (Number(stats.totalChange.replace(/[+%]/g, "")) >= 0
+        ? "positive"
+        : "negative") as "positive" | "negative",
       icon: Circle,
     },
     {
-      label: "In Progress",
+      label: "In Progress This Week",
       value: stats.inProgress,
-      change: "+5% from last week",
-      changeType: "positive" as const,
+      change: `${stats.inProgressChange} from last week`,
+      changeType: (Number(stats.inProgressChange.replace(/[+%]/g, "")) >= 0
+        ? "positive"
+        : "negative") as "positive" | "negative",
       icon: Clock,
     },
     {
-      label: "Completed",
+      label: "Completed This Week",
       value: stats.completed,
-      change: "+23% from last week",
-      changeType: "positive" as const,
+      change: `${stats.completedChange} from last week`,
+      changeType: (Number(stats.completedChange.replace(/[+%]/g, "")) >= 0
+        ? "positive"
+        : "negative") as "positive" | "negative",
       icon: CheckCircle2,
     },
     {
-      label: "Overdue",
-      value: stats.overdue,
-      change: "-8% from last week",
-      changeType: "negative" as const,
+      label: "Total Overdue",
+      value: stats.totalOverdue,
+      change: `Total of ${stats.totalOverdue === 0 ? "No" : stats.totalOverdue} overdue tasks`,
+      changeType: stats.totalOverdue === 0 ? "positive" : "negative",
       icon: AlertTriangle,
     },
   ];
 
   return (
-    <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => (
-        <div
-          key={card.label}
-          className="rounded-xl border border-border bg-card p-4 sm:p-6"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                {card.label}
-              </p>
-              <p className="mt-1 text-2xl sm:text-3xl font-bold text-foreground">
-                {card.value}
-              </p>
-              <p
-                className={`mt-1 text-[10px] sm:text-xs ${card.changeType === "positive" ? "text-primary" : "text-destructive"}`}
-              >
-                {card.change}
-              </p>
-            </div>
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      {stats.isLoading
+        ? // Loading skeleton cards
+          Array.from({ length: 4 }).map((_, index) => (
             <div
-              className={`rounded-full p-1.5 sm:p-2 ${card.label === "Overdue" ? "text-destructive" : "text-primary"}`}
+              key={`skeleton-${index}`}
+              className="rounded-xl border border-border bg-card p-4 sm:p-7"
             >
-              <card.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+              <div className="flex items-center justify-between">
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-3 w-20 sm:w-24" />
+                  <Skeleton className="h-8 w-12 sm:w-16" />
+                  <Skeleton className="h-3 w-16 sm:w-20" />
+                </div>
+                <Skeleton className="h-10 w-10 rounded-full" />
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          ))
+        : cards.map((card) => (
+            <div
+              key={card.label}
+              className="rounded-xl border border-border bg-card p-4 sm:p-6"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {card.label}
+                  </p>
+                  <p className="mt-1 text-2xl sm:text-3xl font-bold text-foreground">
+                    {card.value}
+                  </p>
+                  <p
+                    className={`mt-1 text-[10px] sm:text-xs ${card.changeType === "positive" ? "text-primary" : "text-destructive"}`}
+                  >
+                    {card.change}
+                  </p>
+                </div>
+                <div
+                  className={`rounded-full p-1.5 sm:p-2 ${card.changeType === "positive" ? "text-primary" : "text-destructive"}`}
+                >
+                  <card.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                </div>
+              </div>
+            </div>
+          ))}
     </div>
   );
 }
