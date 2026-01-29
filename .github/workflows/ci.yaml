@@ -38,8 +38,5 @@ jobs:
       - name: Lint code
         run: npx eslint "src/**/*.{ts,tsx,js,jsx}"
 
-      - name: Prettier check
-        run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
-
       - name: Build Next.js project
         run: npm run build

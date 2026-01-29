@@ -2,7 +2,6 @@ import api from "@/lib/axios";
 import { formatDateOnly } from "@/lib/date";
 import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
 
-
 export const taskApi = {
   getTasks: async (query: TaskQueryParams) => {
     const utcStartDate = query?.startDate
