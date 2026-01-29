@@ -1,4 +1,4 @@
-import { PaginationMeta } from "@/types/PaginationMeta";
+import { paths } from "@/api/types";
 
 export interface ProjectDto {
   id: string;
@@ -8,7 +8,6 @@ export interface ProjectDto {
   updatedAt: string;
 }
 
-export interface ProjectsResponse {
-  projects: ProjectDto[];
-  meta: PaginationMeta;
-}
+export type GetProjectsQuery = paths["/projects"]["get"]["parameters"]["query"];
+export type GetProjectsResponse =
+  paths["/projects"]["get"]["responses"]["200"]["content"]["application/json"];
