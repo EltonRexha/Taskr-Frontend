@@ -4,388 +4,388 @@
  */
 
 export interface paths {
-  "/webhooks/clerk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/webhooks/clerk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["WebhooksController_handleClerk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations["WebhooksController_handleClerk"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/projects": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_findAll"];
+        put?: never;
+        post: operations["ProjectsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["ProjectsController_findAll"];
-    put?: never;
-    post: operations["ProjectsController_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/projects/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["ProjectsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ProjectsController_update"];
+        trace?: never;
     };
-    get: operations["ProjectsController_findOne"];
-    put?: never;
-    post?: never;
-    delete: operations["ProjectsController_remove"];
-    options?: never;
-    head?: never;
-    patch: operations["ProjectsController_update"];
-    trace?: never;
-  };
-  "/tasks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TasksController_findAll"];
+        put?: never;
+        post: operations["TasksController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["TasksController_findAll"];
-    put?: never;
-    post: operations["TasksController_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/tasks/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TasksController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["TasksController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["TasksController_update"];
+        trace?: never;
     };
-    get: operations["TasksController_findOne"];
-    put?: never;
-    post?: never;
-    delete: operations["TasksController_remove"];
-    options?: never;
-    head?: never;
-    patch: operations["TasksController_update"];
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    ProjectDto: {
-      id: string;
-      name: string;
-      projectType: string;
-      createdAt: string;
-      updatedAt: string;
+    schemas: {
+        ProjectDto: {
+            id: string;
+            name: string;
+            projectType: string;
+            createdAt: string;
+            updatedAt: string;
+        };
+        ProjectsResponseDto: {
+            /**
+             * @description Page number
+             * @default 1
+             */
+            page: number;
+            /**
+             * @description Number of items per page
+             * @default 10
+             */
+            limit: number;
+            projects: components["schemas"]["ProjectDto"][];
+        };
+        TaskProjectDto: {
+            id: string;
+            name: string;
+        };
+        TaskMetaDto: {
+            id: string;
+            status: string;
+            type: string;
+        };
+        TaskDto: {
+            id: string;
+            description: string;
+            label: string;
+            priority: string;
+            startDate: string;
+            dueDate: string;
+            createdAt: string;
+            updatedAt: string;
+            project: components["schemas"]["TaskProjectDto"];
+            metaData?: components["schemas"]["TaskMetaDto"];
+        };
+        TasksResponseDto: {
+            /**
+             * @description Page number
+             * @default 1
+             */
+            page: number;
+            /**
+             * @description Number of items per page
+             * @default 10
+             */
+            limit: number;
+            tasks: components["schemas"]["TaskDto"][];
+        };
     };
-    ProjectsResponseDto: {
-      /**
-       * @description Page number
-       * @default 1
-       */
-      page: number;
-      /**
-       * @description Number of items per page
-       * @default 10
-       */
-      limit: number;
-      projects: components["schemas"]["ProjectDto"][];
-    };
-    TaskProjectDto: {
-      id: string;
-      name: string;
-    };
-    TaskMetaDto: {
-      id: string;
-      status: string;
-      type: string;
-    };
-    TaskDto: {
-      id: string;
-      description: string;
-      label: string;
-      priority: string;
-      startDate: string;
-      dueDate: string;
-      createdAt: string;
-      updatedAt: string;
-      project: components["schemas"]["TaskProjectDto"];
-      metaData?: components["schemas"]["TaskMetaDto"];
-    };
-    TasksResponseDto: {
-      /**
-       * @description Page number
-       * @default 1
-       */
-      page: number;
-      /**
-       * @description Number of items per page
-       * @default 10
-       */
-      limit: number;
-      tasks: components["schemas"]["TaskDto"][];
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  WebhooksController_handleClerk: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+    WebhooksController_handleClerk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  ProjectsController_findAll: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Number of items per page */
-        limit?: number;
-        /** @description Filter by project name */
-        projectName?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["ProjectsResponseDto"];
+    };
+    ProjectsController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Number of items per page */
+                limit?: number;
+                /** @description Filter by project name */
+                projectName?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  ProjectsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectsResponseDto"];
+                };
+            };
         };
-        content?: never;
-      };
     };
-  };
-  ProjectsController_findOne: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ProjectsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  ProjectsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content?: never;
-      };
     };
-  };
-  ProjectsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ProjectsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  TasksController_findAll: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Number of items per page */
-        limit?: number;
-        /** @description Filter by task description */
-        description?: string;
-        /** @description Filter by project name */
-        projectName?: string;
-        /** @description Filter by label */
-        label?: string;
-        /** @description Filter by priority (e.g., high, low) */
-        priority?: string;
-        /** @description Filter by project ID */
-        projectId?: string;
-        /** @description Filter by type of task */
-        type?: string;
-        /** @description Filter by status (for e.g in scrum, TODO, IN_PROGRESS, IN_REVIEW, DONE) */
-        status?: string;
-        /** @description Filter tasks starting from this date */
-        startDate?: string;
-        /** @description Filter tasks starting after or equal to this date */
-        startDateGte?: string;
-        /** @description Filter tasks due by this date */
-        dueDate?: string;
-        /** @description Filter tasks due before or equal to this date */
-        dueDateLte?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["TasksResponseDto"];
+    };
+    ProjectsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-      };
-    };
-  };
-  TasksController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content?: never;
-      };
     };
-  };
-  TasksController_findOne: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ProjectsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  TasksController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content?: never;
-      };
     };
-  };
-  TasksController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    TasksController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Number of items per page */
+                limit?: number;
+                /** @description Filter by task description */
+                description?: string;
+                /** @description Filter by project name */
+                projectName?: string;
+                /** @description Filter by label */
+                label?: string;
+                /** @description Filter by priority (e.g., high, low) */
+                priority?: string;
+                /** @description Filter by project ID */
+                projectId?: string;
+                /** @description Filter by type of task */
+                type?: string;
+                /** @description Filter by status (for e.g in scrum, TODO, IN_PROGRESS, IN_REVIEW, DONE) */
+                status?: string;
+                /** @description Filter tasks starting from this date */
+                startDate?: string;
+                /** @description Filter tasks starting after or equal to this date */
+                startDateGte?: string;
+                /** @description Filter tasks due by this date */
+                dueDate?: string;
+                /** @description Filter tasks due before or equal to this date */
+                dueDateLte?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasksResponseDto"];
+                };
+            };
+        };
     };
-  };
+    TasksController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TasksController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TasksController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TasksController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
 }

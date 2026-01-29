@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "openapi-typescript:generate": "npx openapi-typescript http://localhost:3001/docs-json -o src/api/types.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
