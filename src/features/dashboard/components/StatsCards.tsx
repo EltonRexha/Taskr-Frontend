@@ -1,14 +1,14 @@
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { CheckCircle2, Circle, Clock, AlertTriangle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { TaskDto } from "@/features/tasks/types/tasks.types";
 import { getWeekRange } from "@/lib/date";
 import { format } from "date-fns";
+import type { TaskDto } from "@/features/tasks/types/tasks.types";
 
 const TASK_LIMIT = 50;
 
-function getTaskStatus(task: TaskDto): string | null {
-  return task.metaData.status;
+function getTaskStatus(task: TaskDto): string | undefined {
+  return task.metaData?.status;
 }
 
 function isTaskCompleted(task: TaskDto): boolean {

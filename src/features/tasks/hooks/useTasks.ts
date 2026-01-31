@@ -1,80 +1,31 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { taskApi } from "../api/tasks.api";
 import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE } from "@/lib/constants";
-import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
+import { paths } from "@/api/types";
+
+type TaskQueryParams = paths["/tasks"]["get"]["parameters"]["query"];
 
 const tasksQueryKeys = {
   all: ["tasks"] as const,
-  list: ({
-    projectName,
-    projectId,
-    description,
-    limit,
-    page,
-    startDate,
-    startDateGte,
-    dueDate,
-    dueDateLte,
-    status,
-    type,
-  }: TaskQueryParams) =>
-    [
-      tasksQueryKeys.all,
-      "list",
-      projectName,
-      projectId,
-      description,
-      limit,
-      page,
-      startDate,
-      startDateGte,
-      dueDate,
-      dueDateLte,
-      status,
-      type,
-    ] as const,
+  list: (stringifiedQuery: string) => ["tasks", stringifiedQuery] as const,
 };
 
-export const useTasks = ({
-  projectName,
-  projectId,
-  description,
-  limit = DEFAULT_PAGE_SIZE,
-  page = DEFAULT_PAGE,
-  status,
-  type,
-  startDate,
-  startDateGte,
-  dueDate,
-  dueDateLte,
-}: TaskQueryParams): UseQueryResult<TasksResponse, Error> => {
+export const useTasks = (query: TaskQueryParams) => {
+  const limit = query?.limit || DEFAULT_PAGE_SIZE;
+  const page = query?.page || DEFAULT_PAGE;
   return useQuery({
-    queryKey: tasksQueryKeys.list({
-      projectName,
-      projectId,
-      description,
-      limit,
-      page,
-      startDate,
-      startDateGte,
-      dueDate,
-      dueDateLte,
-      status,
-      type,
-    }),
-    queryFn: () =>
-      taskApi.getTasks({
-        projectName,
-        projectId,
-        description,
-        startDate,
-        startDateGte,
-        dueDate,
-        dueDateLte,
+    queryKey: tasksQueryKeys.list(
+      JSON.stringify({
+        ...query,
         limit,
         page,
-        status,
-        type,
+      }),
+    ),
+    queryFn: () =>
+      taskApi.getTasks({
+        ...query,
+        limit,
+        page,
       }),
   });
 };

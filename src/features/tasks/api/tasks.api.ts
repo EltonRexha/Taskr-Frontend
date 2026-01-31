@@ -1,41 +1,29 @@
 import api from "@/lib/axios";
-import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
 import { formatDateOnly } from "@/lib/date";
+import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
 
 export const taskApi = {
-  getTasks: async ({
-    projectName,
-    projectId,
-    description,
-    startDate,
-    startDateGte,
-    dueDate,
-    dueDateLte,
-    status,
-    type,
-    limit,
-    page,
-  }: TaskQueryParams) => {
-    const utcStartDate = startDate ? formatDateOnly(startDate) : undefined;
-    const utcStartDateGte = startDateGte
-      ? formatDateOnly(startDateGte)
+  getTasks: async (query: TaskQueryParams) => {
+    const utcStartDate = query?.startDate
+      ? formatDateOnly(query.startDate)
       : undefined;
-    const utcDueDate = dueDate ? formatDateOnly(dueDate) : undefined;
-    const utcDueDateLte = dueDateLte ? formatDateOnly(dueDateLte) : undefined;
+    const utcStartDateGte = query?.startDateGte
+      ? formatDateOnly(query.startDateGte)
+      : undefined;
+    const utcDueDate = query?.dueDate
+      ? formatDateOnly(query.dueDate)
+      : undefined;
+    const utcDueDateLte = query?.dueDateLte
+      ? formatDateOnly(query.dueDateLte)
+      : undefined;
 
     const response = await api.get<TasksResponse>("/tasks", {
       params: {
-        projectName,
-        projectId,
-        description,
+        ...query,
         startDate: utcStartDate,
         startDateGte: utcStartDateGte,
         dueDate: utcDueDate,
         dueDateLte: utcDueDateLte,
-        status,
-        type,
-        limit,
-        page,
       },
     });
 
