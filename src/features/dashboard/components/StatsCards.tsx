@@ -47,8 +47,6 @@ function useDashboardStats() {
   const thisWeekData = thisWeekTasks.data?.tasks || [];
   const lastWeekData = lastWeekTasks.data?.tasks || [];
 
-  console.log({ thisWeekData, lastWeekData });
-
   const total = thisWeekData.length;
   const taskStats = useTaskStats(thisWeekData);
 

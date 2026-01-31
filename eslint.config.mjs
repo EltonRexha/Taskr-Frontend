@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     },
     rules: {
       "prettier/prettier": "error", // run prettier as a rule
+      "no-console": ["error", { allow: ["error"] }],
     },
   },
   // Override default ignores of eslint-config-next.

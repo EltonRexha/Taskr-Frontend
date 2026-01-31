@@ -14,7 +14,6 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   if (isProtectedRoute(req) && !userId) {
-    console.log("User is not authenticated");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

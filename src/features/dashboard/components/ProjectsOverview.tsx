@@ -440,70 +440,78 @@ export function ProjectsOverview() {
         {projects.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">No projects yet</p>
-            <p className="text-muted-foreground text-xs mt-1">Create your first project to get started</p>
+            <p className="text-muted-foreground text-xs mt-1">
+              Create your first project to get started
+            </p>
           </div>
         ) : (
           projects.map((project) => {
-          const projectTasks = getTasksByProject(project.id);
-          const completedTasks = projectTasks.filter(
-            (t) => t.status === "done",
-          ).length;
-          const inProgressTasks = projectTasks.filter(
-            (t) => t.status === "in-progress",
-          ).length;
-          const overdueTasks = projectTasks.filter(
-            (t) => {
+            const projectTasks = getTasksByProject(project.id);
+            const completedTasks = projectTasks.filter(
+              (t) => t.status === "done",
+            ).length;
+            const inProgressTasks = projectTasks.filter(
+              (t) => t.status === "in-progress",
+            ).length;
+            const overdueTasks = projectTasks.filter((t) => {
               if (!t.dueDate) return false;
               return new Date(t.dueDate) < new Date() && t.status !== "done";
-            }
-          ).length;
+            }).length;
 
-          return (
-            <Link
-              key={project.id}
-              href={`/dashboard/projects/${project.id}`}
-              className="block"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">
-                    {project.name}
+            return (
+              <Link
+                key={project.id}
+                href={`/dashboard/projects/${project.id}`}
+                className="block"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-foreground">
+                      {project.name}
+                    </span>
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      <Users className="h-3 w-3" />
+                      <span className="text-xs">{project.members.length}</span>
+                    </div>
+                  </div>
+                  <span className="text-xs px-2 py-1 rounded-full bg-secondary text-muted-foreground">
+                    {project.type}
                   </span>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Users className="h-3 w-3" />
-                    <span className="text-xs">{project.members.length}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                    <span className="text-muted-foreground">Tasks:</span>
+                    <span className="font-medium text-foreground">
+                      {projectTasks.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-muted-foreground">Done:</span>
+                    <span className="font-medium text-foreground">
+                      {completedTasks}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                    <span className="text-muted-foreground">In Progress:</span>
+                    <span className="font-medium text-foreground">
+                      {inProgressTasks}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-3 w-3 text-red-500" />
+                    <span className="text-muted-foreground">Overdue:</span>
+                    <span className="font-medium text-foreground">
+                      {overdueTasks}
+                    </span>
                   </div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-secondary text-muted-foreground">
-                  {project.type}
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                  <span className="text-muted-foreground">Tasks:</span>
-                  <span className="font-medium text-foreground">{projectTasks.length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-muted-foreground">Done:</span>
-                  <span className="font-medium text-foreground">{completedTasks}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                  <span className="text-muted-foreground">In Progress:</span>
-                  <span className="font-medium text-foreground">{inProgressTasks}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-3 w-3 text-red-500" />
-                  <span className="text-muted-foreground">Overdue:</span>
-                  <span className="font-medium text-foreground">{overdueTasks}</span>
-                </div>
-              </div>
-            </Link>
-          );
-        })
+              </Link>
+            );
+          })
         )}
       </div>
     </div>
