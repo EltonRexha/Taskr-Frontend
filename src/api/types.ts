@@ -138,6 +138,7 @@ export interface components {
         TaskDto: {
             id: string;
             description: string;
+            title: string;
             label: string;
             priority: string;
             startDate: string;
@@ -310,6 +311,8 @@ export interface operations {
                 dueDate?: string;
                 /** @description Filter tasks due before or equal to this date */
                 dueDateLte?: string;
+                /** @description Sort by fields in format field:order (e.g., priority:desc) */
+                sortBy?: string[];
             };
             header?: never;
             path?: never;

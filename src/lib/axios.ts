@@ -1,4 +1,5 @@
 import Axios from "axios";
+import qs from "qs";
 
 const api = Axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_API_URL,
@@ -6,6 +7,7 @@ const api = Axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  paramsSerializer: (params) => qs.stringify(params, { arrayFormat: "repeat" }),
 });
 
 let getToken: () => Promise<string | null>;

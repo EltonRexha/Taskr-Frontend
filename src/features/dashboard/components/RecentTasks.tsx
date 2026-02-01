@@ -85,6 +85,7 @@ export function RecentTasks() {
 
   const recentTasks = useTasks({
     startDateLte: todayStr,
+    sortBy: ["startDate:asc"],
   });
 
   const tasks = recentTasks.data?.tasks || [];
@@ -148,7 +149,7 @@ export function RecentTasks() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1 sm:gap-2">
                     <span className="text-xs sm:text-sm font-medium text-foreground truncate">
-                      {task.description}
+                      {task.title}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
