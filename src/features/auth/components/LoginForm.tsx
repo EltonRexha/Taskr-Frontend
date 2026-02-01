@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { OAuthStrategy } from "@clerk/types";
-import { useSignIn } from "@clerk/nextjs";
+import { useSignIn, useUser } from "@clerk/nextjs";
 import { LoginSchema } from "@/features/auth/schemas/loginSchema";
 import z from "zod";
 import { useForm } from "react-hook-form";
@@ -43,12 +43,17 @@ function LoginForm() {
     resolver: zodResolver(LoginSchema),
   });
 
+  const user = useUser();
   const { signIn } = useSignIn();
   const router = useRouter();
   const [showSecondFactor, setShowSecondFactor] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [codeError, setCodeError] = useState<string | undefined>(undefined);
   const [loginError, setLoginError] = useState<string | undefined>(undefined);
+
+  if (user.isSignedIn) {
+    router.push("/dashboard");
+  }
 
   if (!signIn) {
     return;

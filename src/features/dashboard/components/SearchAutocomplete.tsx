@@ -12,13 +12,7 @@ import ProjectIcon from "@/features/projects/components/ProjectIcon";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { useDebounce, useLocalStorage } from "@uidotdev/usehooks";
-
-const priorityColors = {
-  low: "bg-gray-500/10 text-gray-400",
-  medium: "bg-yellow-500/10 text-yellow-500",
-  high: "bg-orange-500/10 text-orange-500",
-  urgent: "bg-red-500/10 text-red-500",
-};
+import { getPriorityColor } from "@/features/tasks/libs/getPriorityColor";
 
 const popularSearches = ["homepage", "API", "dashboard", "settings"];
 
@@ -259,9 +253,7 @@ export function SearchAutocomplete() {
                         variant="secondary"
                         className={cn(
                           "text-[10px]",
-                          priorityColors[
-                            task.priority.toLowerCase() as keyof typeof priorityColors
-                          ],
+                          getPriorityColor(task.priority.toLowerCase()),
                         )}
                       >
                         {task.priority}

@@ -65,6 +65,58 @@ export const projects = [
     members: [users[1], users[3], users[4]],
     createdAt: "2025-09-01",
   },
+  {
+    id: "scrum-1",
+    name: "Mobile App",
+    key: "MOB",
+    description:
+      "Native mobile application development using Scrum methodology",
+    type: "scrum",
+    color: "#22c55e",
+    icon: "📱",
+    lead: users[1],
+    members: [users[1], users[3], users[4]],
+    createdAt: "2025-09-01",
+  },
+  {
+    id: "scrum-1",
+    name: "Mobile App",
+    key: "MOB",
+    description:
+      "Native mobile application development using Scrum methodology",
+    type: "scrum",
+    color: "#22c55e",
+    icon: "📱",
+    lead: users[1],
+    members: [users[1], users[3], users[4]],
+    createdAt: "2025-09-01",
+  },
+  {
+    id: "scrum-1",
+    name: "Mobile App",
+    key: "MOB",
+    description:
+      "Native mobile application development using Scrum methodology",
+    type: "scrum",
+    color: "#22c55e",
+    icon: "📱",
+    lead: users[1],
+    members: [users[1], users[3], users[4]],
+    createdAt: "2025-09-01",
+  },
+  {
+    id: "scrum-1",
+    name: "Mobile App",
+    key: "MOB",
+    description:
+      "Native mobile application development using Scrum methodology",
+    type: "scrum",
+    color: "#22c55e",
+    icon: "📱",
+    lead: users[1],
+    members: [users[1], users[3], users[4]],
+    createdAt: "2025-09-01",
+  },
 ];
 
 export const tasks = [
@@ -436,7 +488,7 @@ export function ProjectsOverview() {
         <h3 className="font-semibold text-foreground">Projects</h3>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 lg:h-131 overflow-y-auto">
         {projects.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">No projects yet</p>

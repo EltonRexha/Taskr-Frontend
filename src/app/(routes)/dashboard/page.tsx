@@ -17,7 +17,7 @@ function DashboardPage() {
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8 flex flex-col items-center">
         <div className="max-w-364 w-full flex flex-col gap-6">
           <StatsCards />
-          <div className="grid gap-6 lg:gap-8 lg:grid-cols-3">
+          <div className="xl:grid space-y-2 gap-6 lg:gap-8 xl:grid-cols-3">
             <div className="lg:col-span-2">
               <RecentTasks />
             </div>
