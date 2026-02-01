@@ -35,12 +35,12 @@ function useDashboardStats() {
   const { endDate: lastWeekEnd, startDate: lastWeekStart } = getWeekRange(1);
   const { startDate: thisWeekStart } = getWeekRange();
   const lastWeekTasks = useTasks({
-    dueDateLte: lastWeekEnd,
-    startDateGte: lastWeekStart,
+    due_date_lte: lastWeekEnd,
+    start_date_gte: lastWeekStart,
     limit: TASK_LIMIT,
   });
   const thisWeekTasks = useTasks({
-    startDateGte: thisWeekStart,
+    start_date_gte: thisWeekStart,
     limit: TASK_LIMIT,
   });
 
@@ -82,7 +82,7 @@ function useDashboardStats() {
   );
 
   const overDueTasks = useTasks({
-    dueDateLte: format(new Date(), "yyyy-MM-dd"),
+    due_date_lte: format(new Date(), "yyyy-MM-dd"),
   });
 
   return {

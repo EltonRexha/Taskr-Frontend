@@ -32,7 +32,7 @@ export function SearchAutocomplete() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: projectsData, isLoading: projectsLoading } = useProjects({
-    projectName: debouncedQuery,
+    project_name: debouncedQuery,
   });
   const projects = projectsData?.projects.slice(0, PROJECTS_AMOUNT);
 
@@ -44,7 +44,7 @@ export function SearchAutocomplete() {
 
   //Search tasks with the project name
   const { data: projectTasksData, isLoading: projectTasksLoading } = useTasks({
-    projectName: debouncedQuery,
+    project_name: debouncedQuery,
   });
 
   const descriptionMatchedTasks = descriptionTaskData?.tasks.slice(

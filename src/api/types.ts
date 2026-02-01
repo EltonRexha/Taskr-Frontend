@@ -188,7 +188,7 @@ export interface operations {
                 /** @description Number of items per page */
                 limit?: number;
                 /** @description Filter by project name */
-                projectName?: string;
+                project_name?: string;
             };
             header?: never;
             path?: never;
@@ -290,29 +290,29 @@ export interface operations {
                 /** @description Filter by task description */
                 description?: string;
                 /** @description Filter by project name */
-                projectName?: string;
+                project_name?: string;
                 /** @description Filter by label */
                 label?: string;
                 /** @description Filter by priority (e.g., high, low) */
                 priority?: string;
                 /** @description Filter by project ID */
-                projectId?: string;
+                project_id?: string;
                 /** @description Filter by type of task */
                 type?: string;
                 /** @description Filter by status (for e.g in scrum, TODO, IN_PROGRESS, IN_REVIEW, DONE) */
                 status?: string;
                 /** @description Filter tasks starting from this date */
-                startDate?: string;
+                start_date?: string;
                 /** @description Filter tasks starting after or equal to this date */
-                startDateGte?: string;
+                start_date_gte?: string;
                 /** @description Filter tasks starting before or equal to this date */
-                startDateLte?: string;
+                start_date_lte?: string;
                 /** @description Filter tasks due by this date */
-                dueDate?: string;
+                due_date?: string;
                 /** @description Filter tasks due before or equal to this date */
-                dueDateLte?: string;
+                due_date_lte?: string;
                 /** @description Sort by fields in format field:order (e.g., priority:desc) */
-                sortBy?: string[];
+                sort_by?: string[];
             };
             header?: never;
             path?: never;

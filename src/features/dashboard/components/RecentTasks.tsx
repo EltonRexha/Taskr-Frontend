@@ -57,7 +57,7 @@ function Tooltip({
       {isVisible &&
         createPortal(
           <div
-            className="fixed px-3 py-2 bg-popover border border-border rounded-md text-xs text-popover-foreground whitespace-nowrap z-[9999] pointer-events-none"
+            className="fixed px-3 py-2 bg-popover border border-border rounded-md text-xs text-popover-foreground whitespace-nowrap z-9999 pointer-events-none"
             style={{
               top: `${position.top}px`,
               left: `${position.left}px`,
@@ -84,8 +84,8 @@ export function RecentTasks() {
   const todayStr = format(new Date(), "yyyy-MM-dd");
 
   const recentTasks = useTasks({
-    startDateLte: todayStr,
-    sortBy: ["startDate:asc"],
+    start_date_lte: todayStr,
+    sort_by: ["start_date:asc"],
   });
 
   const tasks = recentTasks.data?.tasks || [];
