@@ -35,19 +35,17 @@ function useDashboardStats() {
   const { endDate: lastWeekEnd, startDate: lastWeekStart } = getWeekRange(1);
   const { startDate: thisWeekStart } = getWeekRange();
   const lastWeekTasks = useTasks({
-    dueDateLte: lastWeekEnd,
-    startDateGte: lastWeekStart,
+    due_date_lte: lastWeekEnd,
+    start_date_gte: lastWeekStart,
     limit: TASK_LIMIT,
   });
   const thisWeekTasks = useTasks({
-    startDateGte: thisWeekStart,
+    start_date_gte: thisWeekStart,
     limit: TASK_LIMIT,
   });
 
   const thisWeekData = thisWeekTasks.data?.tasks || [];
   const lastWeekData = lastWeekTasks.data?.tasks || [];
-
-  console.log({ thisWeekData, lastWeekData });
 
   const total = thisWeekData.length;
   const taskStats = useTaskStats(thisWeekData);
@@ -84,7 +82,7 @@ function useDashboardStats() {
   );
 
   const overDueTasks = useTasks({
-    dueDateLte: format(new Date(), "yyyy-MM-dd"),
+    due_date_lte: format(new Date(), "yyyy-MM-dd"),
   });
 
   return {
@@ -141,7 +139,7 @@ export function StatsCards() {
   ];
 
   return (
-    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 w-full">
       {stats.isLoading
         ? // Loading skeleton cards
           Array.from({ length: 4 }).map((_, index) => (

@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { taskApi } from "../api/tasks.api";
 import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE } from "@/lib/constants";
 import { paths } from "@/api/types";
+import { getNextPageParam } from "@/lib/queryUtils";
 
 type TaskQueryParams = paths["/tasks"]["get"]["parameters"]["query"];
 
@@ -13,7 +14,7 @@ const tasksQueryKeys = {
 export const useTasks = (query: TaskQueryParams) => {
   const limit = query?.limit || DEFAULT_PAGE_SIZE;
   const page = query?.page || DEFAULT_PAGE;
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: tasksQueryKeys.list(
       JSON.stringify({
         ...query,
@@ -21,11 +22,17 @@ export const useTasks = (query: TaskQueryParams) => {
         page,
       }),
     ),
-    queryFn: () =>
+    queryFn: ({ pageParam }) =>
       taskApi.getTasks({
         ...query,
         limit,
-        page,
+        page: pageParam,
       }),
+    getNextPageParam,
+    initialPageParam: page,
+    select: (data) => ({
+      ...data,
+      tasks: data.pages.flatMap((page) => page.tasks),
+    }),
   });
 };
