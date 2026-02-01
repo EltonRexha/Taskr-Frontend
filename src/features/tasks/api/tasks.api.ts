@@ -4,26 +4,26 @@ import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
 
 export const taskApi = {
   getTasks: async (query: TaskQueryParams) => {
-    const utcStartDate = query?.startDate
-      ? formatDateOnly(query.startDate)
+    const utcStartDate = query?.start_date
+      ? formatDateOnly(query.start_date)
       : undefined;
-    const utcStartDateGte = query?.startDateGte
-      ? formatDateOnly(query.startDateGte)
+    const utcStartDateGte = query?.start_date_gte
+      ? formatDateOnly(query.start_date_gte)
       : undefined;
-    const utcDueDate = query?.dueDate
-      ? formatDateOnly(query.dueDate)
+    const utcDueDate = query?.due_date
+      ? formatDateOnly(query.due_date)
       : undefined;
-    const utcDueDateLte = query?.dueDateLte
-      ? formatDateOnly(query.dueDateLte)
+    const utcDueDateLte = query?.due_date_lte
+      ? formatDateOnly(query.due_date_lte)
       : undefined;
 
     const response = await api.get<TasksResponse>("/tasks", {
       params: {
         ...query,
-        startDate: utcStartDate,
-        startDateGte: utcStartDateGte,
-        dueDate: utcDueDate,
-        dueDateLte: utcDueDateLte,
+        start_date: utcStartDate,
+        start_date_gte: utcStartDateGte,
+        due_date: utcDueDate,
+        due_date_lte: utcDueDateLte,
       },
     });
 
