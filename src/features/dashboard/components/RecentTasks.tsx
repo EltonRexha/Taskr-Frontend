@@ -110,140 +110,149 @@ export function RecentTasks() {
 
       <div className="lg:max-h-124 overflow-y-auto">
         <div className="divide-y divide-border">
-          {tasks.map((task) => {
-            const isOverdue = task.dueDate
-              ? new Date(task.dueDate) < new Date()
-              : false;
+          {tasks.length > 0 ? (
+            tasks.map((task) => {
+              const isOverdue = task.dueDate
+                ? new Date(task.dueDate) < new Date()
+                : false;
 
-            const StatusIcon =
-              statusIcons[
-                isOverdue
-                  ? "overdue"
-                  : (task.metaData?.status.toLowerCase() as keyof typeof statusIcons)
-              ];
+              const StatusIcon =
+                statusIcons[
+                  isOverdue
+                    ? "overdue"
+                    : (task.metaData?.status.toLowerCase() as keyof typeof statusIcons)
+                ];
 
-            //Hide its not assigned to anyone right now
-            if (task.assignedTo.length === 0) {
-              return null;
-            }
+              //Hide its not assigned to anyone right now
+              if (task.assignedTo.length === 0) {
+                return null;
+              }
 
-            return (
-              <div
-                key={task.id}
-                className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 hover:bg-secondary/50 transition-colors"
-              >
-                {isOverdue ? (
-                  <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-red-500" />
-                ) : (
-                  <StatusIcon
-                    className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${
-                      task.metaData?.status.toLocaleLowerCase() === "done"
-                        ? "text-primary"
-                        : task.metaData?.status.toLocaleLowerCase() ===
-                            "in-progress"
-                          ? "text-yellow-500"
-                          : "text-muted-foreground"
-                    }`}
-                  />
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <span className="text-xs sm:text-sm font-medium text-foreground truncate">
-                      {task.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
-                    <div
-                      className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full shrink-0"
-                      style={{
-                        backgroundColor: getProjectColorByType(
-                          task.metaData?.type as string,
-                        ),
-                      }}
-                    />
-                    <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                      {task.project.name}
-                    </span>
-                  </div>
-                </div>
-
-                <Badge
-                  className={`${getPriorityColor(
-                    task.priority.toLowerCase(),
-                  )} text-[10px] sm:text-xs hidden sm:flex`}
-                  variant="secondary"
+              return (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 hover:bg-secondary/50 transition-colors"
                 >
-                  {task.priority.charAt(0).toUpperCase() +
-                    task.priority.slice(1)}
-                </Badge>
+                  {isOverdue ? (
+                    <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-red-500" />
+                  ) : (
+                    <StatusIcon
+                      className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${
+                        task.metaData?.status.toLocaleLowerCase() === "done"
+                          ? "text-primary"
+                          : task.metaData?.status.toLocaleLowerCase() ===
+                              "in-progress"
+                            ? "text-yellow-500"
+                            : "text-muted-foreground"
+                      }`}
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <span className="text-xs sm:text-sm font-medium text-foreground truncate">
+                        {task.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5 sm:mt-1">
+                      <div
+                        className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full shrink-0"
+                        style={{
+                          backgroundColor: getProjectColorByType(
+                            task.metaData?.type as string,
+                          ),
+                        }}
+                      />
+                      <span className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                        {task.project.name}
+                      </span>
+                    </div>
+                  </div>
 
-                {task.assignedTo && task.assignedTo.length > 0 && (
-                  <div className="flex -space-x-4">
-                    {task.assignedTo.slice(0, 3).map((assignee, index) => {
-                      const initials =
-                        assignee.user.firstName.slice(0, 1).toUpperCase() +
-                        (assignee.user.lastName as string | null)
-                          ?.slice(0, 1)
-                          .toUpperCase();
-                      const fullName = `${assignee.user.firstName} ${
-                        assignee.user.lastName || ""
-                      }`.trim();
+                  <Badge
+                    className={`${getPriorityColor(
+                      task.priority.toLowerCase(),
+                    )} text-[10px] sm:text-xs hidden sm:flex`}
+                    variant="secondary"
+                  >
+                    {task.priority.charAt(0).toUpperCase() +
+                      task.priority.slice(1)}
+                  </Badge>
 
-                      return (
+                  {task.assignedTo && task.assignedTo.length > 0 && (
+                    <div className="flex -space-x-4">
+                      {task.assignedTo.slice(0, 3).map((assignee, index) => {
+                        const initials =
+                          assignee.user.firstName.slice(0, 1).toUpperCase() +
+                          (assignee.user.lastName as string | null)
+                            ?.slice(0, 1)
+                            .toUpperCase();
+                        const fullName = `${assignee.user.firstName} ${
+                          assignee.user.lastName || ""
+                        }`.trim();
+
+                        return (
+                          <Tooltip
+                            key={`${assignee.user.email}-${index}`}
+                            content={
+                              <>
+                                <div className="font-medium">{fullName}</div>
+                                <div className="text-muted-foreground text-xs">
+                                  {assignee.user.email}
+                                </div>
+                              </>
+                            }
+                          >
+                            <Avatar className="h-6 w-6 sm:h-8 sm:w-8 shrink-0 border-2 border-background transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-md hover:border-primary bg-card">
+                              <AvatarImage
+                                src={
+                                  assignee.user.profileImage ||
+                                  "/placeholder.svg"
+                                }
+                                alt={fullName}
+                              />
+                              <AvatarFallback className="text-[10px] sm:text-xs bg-card">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+                          </Tooltip>
+                        );
+                      })}
+                      {task.assignedTo.length > 3 && (
                         <Tooltip
-                          key={`${assignee.user.email}-${index}`}
                           content={
-                            <>
-                              <div className="font-medium">{fullName}</div>
-                              <div className="text-muted-foreground text-xs">
-                                {assignee.user.email}
-                              </div>
-                            </>
+                            <div className="font-medium">
+                              {task.assignedTo.length - 3} more assignee
+                              {task.assignedTo.length - 3 > 1 ? "s" : ""}
+                            </div>
                           }
                         >
-                          <Avatar className="h-6 w-6 sm:h-8 sm:w-8 shrink-0 border-2 border-background transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-md hover:border-primary bg-card">
-                            <AvatarImage
-                              src={
-                                assignee.user.profileImage || "/placeholder.svg"
-                              }
-                              alt={fullName}
-                            />
-                            <AvatarFallback className="text-[10px] sm:text-xs bg-card">
-                              {initials}
-                            </AvatarFallback>
-                          </Avatar>
-                        </Tooltip>
-                      );
-                    })}
-                    {task.assignedTo.length > 3 && (
-                      <Tooltip
-                        content={
-                          <div className="font-medium">
-                            {task.assignedTo.length - 3} more assignee
-                            {task.assignedTo.length - 3 > 1 ? "s" : ""}
+                          <div className="h-6 w-6 sm:h-8 sm:w-8 shrink-0 rounded-full bg-muted border-2 border-background flex items-center justify-center transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-md hover:border-primary">
+                            <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                              +{task.assignedTo.length - 3}
+                            </span>
                           </div>
-                        }
-                      >
-                        <div className="h-6 w-6 sm:h-8 sm:w-8 shrink-0 rounded-full bg-muted border-2 border-background flex items-center justify-center transition-all duration-200 hover:scale-110 hover:z-10 hover:shadow-md hover:border-primary">
-                          <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
-                            +{task.assignedTo.length - 3}
-                          </span>
-                        </div>
-                      </Tooltip>
-                    )}
-                  </div>
-                )}
+                        </Tooltip>
+                      )}
+                    </div>
+                  )}
 
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8 hidden sm:flex"
-                >
-                  <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
-                </Button>
-              </div>
-            );
-          })}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground h-6 w-6 sm:h-8 sm:w-8 hidden sm:flex"
+                  >
+                    <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                </div>
+              );
+            })
+          ) : (
+            <div className="p-4 text-center">
+              <span className="text-sm text-muted-foreground">
+                No recently started tasks.
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
