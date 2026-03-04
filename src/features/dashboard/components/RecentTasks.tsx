@@ -113,7 +113,8 @@ export function RecentTasks() {
           {tasks.length > 0 ? (
             tasks.map((task) => {
               const isOverdue = task.dueDate
-                ? new Date(task.dueDate) < new Date()
+                ? new Date(task.dueDate) < new Date() &&
+                  task.metaData?.status.toLowerCase() !== "done"
                 : false;
 
               const StatusIcon =
