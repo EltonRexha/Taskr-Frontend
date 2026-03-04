@@ -1,6 +1,11 @@
 import api from "@/lib/axios";
 import { formatDateOnly } from "@/lib/date";
-import { TaskQueryParams, TasksResponse } from "../types/tasks.types";
+import {
+  TaskQueryParams,
+  TasksResponse,
+  TaskSummaryQueryParams,
+  TaskSummaryResponse,
+} from "../types/tasks.types";
 
 export const taskApi = {
   getTasks: async (query: TaskQueryParams) => {
@@ -25,6 +30,14 @@ export const taskApi = {
         due_date: utcDueDate,
         due_date_lte: utcDueDateLte,
       },
+    });
+
+    return response.data;
+  },
+
+  getTasksSummary: async (query: TaskSummaryQueryParams) => {
+    const response = await api.get<TaskSummaryResponse>("/tasks/summary", {
+      params: query,
     });
 
     return response.data;
