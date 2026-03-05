@@ -6,6 +6,39 @@ import type { ProjectDto } from "@/features/projects/types/projects.types";
 
 const PROJECT_LIMIT = 3;
 
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Skeleton placeholder component used when data is loading
+export function ProjectsOverviewSkeleton() {
+  return (
+    <div className="rounded-xl border border-border bg-card animate-pulse">
+      <div className="border-b border-border p-4">
+        <h3 className="font-semibold text-foreground">
+          <Skeleton className="h-4 w-24" />
+        </h3>
+      </div>
+      <div className="p-4 space-y-4 lg:max-h-131 overflow-y-auto">
+        {Array.from({ length: PROJECT_LIMIT }).map((_, idx) => (
+          <div key={idx} className="space-y-2">
+            {/* first row: name + members + type badge */}
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-4 w-12" />
+            </div>
+            {/* second row: stats grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function ProjectsOverview() {
   const {
     data: projectsData,
@@ -25,7 +58,8 @@ export function ProjectsOverview() {
   }
 
   if ((projectsLoading || summariesLoading) && projects.length === 0) {
-    return null;
+    // show skeleton when first page is loading and there are no projects yet
+    return <ProjectsOverviewSkeleton />;
   }
 
   return (

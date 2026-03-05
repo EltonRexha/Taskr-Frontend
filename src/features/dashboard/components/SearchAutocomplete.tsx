@@ -42,6 +42,11 @@ export function SearchAutocomplete() {
       description: debouncedQuery,
     });
 
+  //Search tasks with the task title
+  const { data: titleTaskData, isLoading: titleTaskLoading } = useTasks({
+    title: debouncedQuery,
+  });
+
   //Search tasks with the project name
   const { data: projectTasksData, isLoading: projectTasksLoading } = useTasks({
     project_name: debouncedQuery,
@@ -52,12 +57,15 @@ export function SearchAutocomplete() {
     TASKS_AMOUNT,
   );
   const projectTasks = projectTasksData?.tasks.slice(0, TASKS_AMOUNT);
+  const titleMatchedTasks = titleTaskData?.tasks.slice(0, TASKS_AMOUNT);
 
   const tasks = Array.from(
     new Map(
-      [...(descriptionMatchedTasks ?? []), ...(projectTasks ?? [])].map(
-        (task) => [task.id, task],
-      ),
+      [
+        ...(descriptionMatchedTasks ?? []),
+        ...(titleMatchedTasks ?? []),
+        ...(projectTasks ?? []),
+      ].map((task) => [task.id, task]),
     ).values(),
   );
 
@@ -242,7 +250,7 @@ export function SearchAutocomplete() {
                             {task.label}
                           </span>
                           <p className="text-sm font-medium text-foreground truncate">
-                            {task.description}
+                            {task.title}
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground">

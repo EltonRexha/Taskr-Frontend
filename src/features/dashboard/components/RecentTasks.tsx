@@ -15,6 +15,7 @@ import {
   Eye,
   Loader2,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statusIcons = {
   overdue: AlertTriangle,
@@ -79,6 +80,43 @@ function Tooltip({
     </>
   );
 }
+// skeleton version of the list shown while loading
+export function RecentTasksSkeleton() {
+  return (
+    <div className="rounded-xl border border-border bg-card animate-pulse">
+      <div className="flex items-center justify-between border-b border-border p-3 sm:p-4">
+        <Skeleton className="h-4 w-48" />
+      </div>
+      <div className="lg:max-h-124 overflow-y-auto">
+        <div className="divide-y divide-border">
+          {Array.from({ length: 10 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4"
+            >
+              {/* status icon */}
+              <Skeleton className="h-4 w-4 sm:h-5 sm:w-5 shrink-0" />
+              {/* main text area */}
+              <div className="flex-1 min-w-0">
+                <Skeleton className="h-4 w-3/4 mb-1" />
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-3 w-3 rounded-full" />
+                  <Skeleton className="h-3 w-1/3" />
+                </div>
+              </div>
+              {/* priority badge placeholder */}
+              <Skeleton className="h-5 w-12 hidden sm:block" />
+              {/* assigned avatar placeholder */}
+              <Skeleton className="h-6 w-6 sm:h-8 sm:w-8 rounded-full" />
+              {/* more button placeholder */}
+              <Skeleton className="h-6 w-6 sm:h-8 sm:w-8" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function RecentTasks() {
   const todayStr = format(new Date(), "yyyy-MM-dd");
@@ -95,9 +133,9 @@ export function RecentTasks() {
     return null;
   }
 
-  // Show loading state only on first load
+  // Show loading skeleton only on first load
   if (!recentTasks.data && tasks.length === 0) {
-    return null;
+    return <RecentTasksSkeleton />;
   }
 
   return (
