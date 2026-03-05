@@ -69,13 +69,15 @@ export function Sidebar() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Projects
               </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 text-muted-foreground hover:text-sidebar-foreground"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              <Link href="/dashboard/projects/new">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 text-muted-foreground hover:text-sidebar-foreground"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
 
             {projects ? (
