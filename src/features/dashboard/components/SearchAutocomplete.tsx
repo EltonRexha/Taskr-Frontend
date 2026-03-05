@@ -70,7 +70,10 @@ export function SearchAutocomplete() {
   );
 
   const loading =
-    descriptionTaskLoading || projectTasksLoading || projectsLoading;
+    descriptionTaskLoading ||
+    projectTasksLoading ||
+    projectsLoading ||
+    titleTaskLoading;
 
   const totalResults = (tasks?.length || 0) + (projects?.length || 0);
 
