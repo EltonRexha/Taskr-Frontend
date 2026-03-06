@@ -69,19 +69,20 @@ export function Sidebar() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Projects
               </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-5 w-5 text-muted-foreground hover:text-sidebar-foreground"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              <Link href="/dashboard/projects/new">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 text-muted-foreground hover:text-sidebar-foreground"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </Link>
             </div>
 
             {projects ? (
               projects.map((project) => {
                 const isActive = pathname.includes(project.id);
-                const taskCount = project.projectType === "kanban" ? 6 : 10;
 
                 return (
                   <Link
@@ -99,16 +100,13 @@ export function Sidebar() {
                         className="h-2 w-2 rounded-full"
                         style={{
                           backgroundColor:
-                            project.projectType === "kanban"
+                            project.projectType === "KANBAN"
                               ? "#FF0000"
                               : "#00FF00",
                         }}
                       />
                       <span>{project.name}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {taskCount}
-                    </span>
                   </Link>
                 );
               })

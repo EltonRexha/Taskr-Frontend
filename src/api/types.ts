@@ -104,10 +104,39 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    InviteMemberDto: {
+      /** @description The email of the member to invite */
+      email: string;
+      /** @description The role of the member to invite */
+      role: string;
+    };
+    CreateProjectDto: {
+      /** @description The name of the project */
+      name: string;
+      /** @description The type of the project */
+      type: string;
+      /** @description The members to invite to the project */
+      invites: components["schemas"]["InviteMemberDto"][];
+    };
+    ProjectMemberDto: {
+      userClerkId: string;
+      /** @enum {string} */
+      role: "ADMIN" | "MEMBER" | "VIEWER";
+    };
+    ProjectResponseDto: {
+      id: string;
+      name: string;
+      /** @enum {string} */
+      projectType: "SCRUM" | "KANBAN";
+      members: components["schemas"]["ProjectMemberDto"][];
+      createdAt: string;
+      updatedAt: string;
+    };
     ProjectDto: {
       id: string;
       name: string;
-      projectType: string;
+      /** @enum {string} */
+      projectType: "SCRUM" | "KANBAN";
       createdAt: string;
       updatedAt: string;
     };
@@ -148,8 +177,10 @@ export interface components {
     };
     TaskMetaDto: {
       id: string;
-      status: string;
-      type: string;
+      /** @enum {string} */
+      status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
+      /** @enum {string} */
+      type: "SCRUM" | "KANBAN";
     };
     TaskDto: {
       id: string;
@@ -213,6 +244,8 @@ export interface operations {
         limit?: number;
         /** @description Filter by project name */
         project_name?: string;
+        /** @description Filter by project name */
+        project_name_like?: string;
       };
       header?: never;
       path?: never;
@@ -237,13 +270,19 @@ export interface operations {
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateProjectDto"];
+      };
+    };
     responses: {
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["ProjectResponseDto"];
+        };
       };
     };
   };
@@ -313,17 +352,19 @@ export interface operations {
         limit?: number;
         /** @description Filter by task description */
         description?: string;
+        /** @description Filter by task title */
+        title?: string;
         /** @description Filter by project name */
         project_name?: string;
         /** @description Filter by label */
         label?: string;
-        /** @description Filter by priority (e.g., high, low) */
+        /** @description Filter by priority (e.g., HIGH, LOW) */
         priority?: string;
         /** @description Filter by project ID */
         project_id?: string;
-        /** @description Filter by type of task */
+        /** @description Filter by project type (e.g., SCRUM, KANBAN) */
         type?: string;
-        /** @description Filter by status (for e.g in scrum, TODO, IN_PROGRESS, IN_REVIEW, DONE) */
+        /** @description Filter by Scrum task status (TODO, IN_PROGRESS, IN_REVIEW, DONE) */
         status?: string;
         /** @description Filter tasks starting from this date */
         start_date?: string;

@@ -61,5 +61,5 @@ export function getDashboardNavConfig(): DashboardNavGroup[] {
 export function getActiveDashboardNav(pathname: string) {
   const navConfig = getDashboardNavConfig();
 
-  return navConfig.find((group) => group.matchRoute === pathname);
+  return navConfig.find((group) => pathname.includes(group.matchRoute));
 }
