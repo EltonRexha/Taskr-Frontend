@@ -83,7 +83,6 @@ export function Sidebar() {
             {projects ? (
               projects.map((project) => {
                 const isActive = pathname.includes(project.id);
-                const taskCount = project.projectType === "kanban" ? 6 : 10;
 
                 return (
                   <Link
@@ -101,16 +100,13 @@ export function Sidebar() {
                         className="h-2 w-2 rounded-full"
                         style={{
                           backgroundColor:
-                            project.projectType === "kanban"
+                            project.projectType === "KANBAN"
                               ? "#FF0000"
                               : "#00FF00",
                         }}
                       />
                       <span>{project.name}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {taskCount}
-                    </span>
                   </Link>
                 );
               })
