@@ -22,6 +22,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Columns3, Plus, RefreshCcw, Trash2, Users } from "lucide-react";
 import Logo from "@/components/Logo";
+import {
+  useMutateProjects,
+  useProjects,
+} from "@/features/projects/hooks/use-projects";
+import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+import { useDebounce } from "@uidotdev/usehooks";
 
 type ProjectType = "SCRUM" | "KANBAN";
 type ProjectMemberRole = "ADMIN" | "MEMBER" | "VIEWER";
@@ -32,7 +39,7 @@ type InviteMember = {
 };
 
 type NewProjectFormState = {
-  name: string;
+  name: string | null;
   type: ProjectType | null;
   invites: InviteMember[];
 };
@@ -75,12 +82,24 @@ function isValidEmail(value: string) {
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const user = useUser();
+  const mutateProjects = useMutateProjects();
   const [stepIndex, setStepIndex] = useState(0);
   const [state, setState] = useState<NewProjectFormState>({
-    name: "Project 1",
+    name: null,
     type: null,
     invites: [],
   });
+
+  const debouncedProjectName = useDebounce(state.name?.trim() || null, 500);
+
+  const { data: projectsData } = useProjects({
+    project_name: debouncedProjectName ?? undefined,
+  });
+
+  const projectExists: boolean = debouncedProjectName
+    ? (projectsData?.projects?.length ?? 0) > 0
+    : false;
 
   const steps = useMemo<Array<WizardStep<NewProjectFormState>>>(
     () => [
@@ -88,12 +107,13 @@ export default function NewProjectPage() {
         id: "basics",
         title: "Project basics",
         description: "Name your project and preview the workspace.",
-        isValid: (s) => Boolean(s.name.trim()),
+        isValid: (s) => Boolean(s.name?.trim()) && !projectExists,
         render: ({ state: s, setState: setS }) => (
           <ProjectBasicsStep
             name={s.name}
             setName={(name) => setS((prev) => ({ ...prev, name }))}
             type={s.type}
+            projectExists={projectExists}
           />
         ),
       },
@@ -117,12 +137,15 @@ export default function NewProjectPage() {
         render: ({ state: s, setState: setS }) => (
           <InviteMembersStep
             invites={s.invites}
+            userEmails={
+              user.user?.emailAddresses?.map((ea) => ea.emailAddress) || []
+            }
             setInvites={(invites) => setS((prev) => ({ ...prev, invites }))}
           />
         ),
       },
     ],
-    [],
+    [user, projectExists],
   );
 
   const activeStep = steps[stepIndex];
@@ -142,8 +165,21 @@ export default function NewProjectPage() {
   };
 
   const finish = async () => {
-    // TODO: call create project API with { name: state.name, type: state.type, invites: state.invites }
-    router.push("/dashboard");
+    try {
+      if (!canProceed || !state.name) return;
+      await mutateProjects.mutateAsync({
+        name: state.name,
+        type: state.type!,
+        invites: state.invites.map((i) => ({
+          email: i.email,
+          role: i.role,
+        })),
+      });
+      router.push("/dashboard");
+      toast.success("Project created successfully!");
+    } catch {
+      toast.error("Failed to create project. Please try again.");
+    }
   };
 
   return (
@@ -168,7 +204,7 @@ export default function NewProjectPage() {
             </div>
           </div>
 
-          <div className="min-h-[420px]">
+          <div className="min-h-105">
             {activeStep?.render({ state, setState })}
           </div>
         </div>
@@ -201,10 +237,12 @@ function ProjectBasicsStep({
   name,
   setName,
   type,
+  projectExists,
 }: {
-  name: string;
+  name: string | null;
   setName: (value: string) => void;
   type: ProjectType | null;
+  projectExists: boolean;
 }) {
   return (
     <div className="flex flex-col gap-6 sm:gap-12">
@@ -219,16 +257,25 @@ function ProjectBasicsStep({
             </Label>
             <Input
               id="project-name"
-              value={name}
+              value={name ?? ""}
               onChange={(e) => setName(e.target.value)}
               placeholder="My awesome project"
-              className="text-base sm:text-lg h-11 sm:h-12"
+              className={cn(
+                "text-base sm:text-lg h-11 sm:h-12",
+                projectExists && name?.trim() && "border-red-500",
+              )}
             />
+            {projectExists && name?.trim() && (
+              <p className="text-sm text-red-500">
+                A project with this name already exists. Please choose a
+                different name.
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      <ProjectPreview name={name} type={type} />
+      <ProjectPreview name={name ?? ""} type={type} />
     </div>
   );
 }
@@ -282,18 +329,23 @@ function ProjectTypeStep({
 function InviteMembersStep({
   invites,
   setInvites,
+  userEmails,
 }: {
   invites: InviteMember[];
   setInvites: (invites: InviteMember[]) => void;
+  userEmails: string[];
 }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<ProjectMemberRole>("VIEWER");
   const normalized = email.trim().toLowerCase();
   const canAdd = isValidEmail(normalized);
   const isDuplicate = invites.some((i) => i.email.toLowerCase() === normalized);
+  const isCurrentUser = userEmails.some(
+    (ue) => ue.toLowerCase() === normalized,
+  );
 
   const add = () => {
-    if (!canAdd || isDuplicate) return;
+    if (!canAdd || isDuplicate || isCurrentUser) return;
     setInvites([...invites, { email: normalized, role }]);
     setEmail("");
     setRole("VIEWER");
@@ -357,7 +409,7 @@ function InviteMembersStep({
             <Button
               type="button"
               onClick={add}
-              disabled={!canAdd || isDuplicate}
+              disabled={!canAdd || isDuplicate || isCurrentUser}
               className="h-10 w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -373,7 +425,9 @@ function InviteMembersStep({
               ? "Enter a valid email address."
               : isDuplicate
                 ? "That email is already in the list."
-                : "Looks good."}
+                : isCurrentUser
+                  ? "You can't invite yourself."
+                  : "Looks good."}
         </div>
 
         <div className="mt-6">
@@ -406,7 +460,7 @@ function InviteMembersStep({
                         updateRole(inv.email, v as ProjectMemberRole)
                       }
                     >
-                      <SelectTrigger className="w-[160px] h-9">
+                      <SelectTrigger className="w-40 h-9">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

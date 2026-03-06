@@ -32,7 +32,7 @@ export function SearchAutocomplete() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: projectsData, isLoading: projectsLoading } = useProjects({
-    project_name: debouncedQuery,
+    project_name_like: debouncedQuery,
   });
   const projects = projectsData?.projects.slice(0, PROJECTS_AMOUNT);
 

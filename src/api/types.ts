@@ -29,7 +29,7 @@ export interface paths {
         };
         get: operations["ProjectsController_findAll"];
         put?: never;
-        post?: never;
+        post: operations["ProjectsController_create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -104,6 +104,34 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        InviteMemberDto: {
+            /** @description The email of the member to invite */
+            email: string;
+            /** @description The role of the member to invite */
+            role: string;
+        };
+        CreateProjectDto: {
+            /** @description The name of the project */
+            name: string;
+            /** @description The type of the project */
+            type: string;
+            /** @description The members to invite to the project */
+            invites: components["schemas"]["InviteMemberDto"][];
+        };
+        ProjectMemberDto: {
+            userClerkId: string;
+            /** @enum {string} */
+            role: "ADMIN" | "MEMBER" | "VIEWER";
+        };
+        ProjectResponseDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            projectType: "SCRUM" | "KANBAN";
+            members: components["schemas"]["ProjectMemberDto"][];
+            createdAt: string;
+            updatedAt: string;
+        };
         ProjectDto: {
             id: string;
             name: string;
@@ -216,6 +244,8 @@ export interface operations {
                 limit?: number;
                 /** @description Filter by project name */
                 project_name?: string;
+                /** @description Filter by project name */
+                project_name_like?: string;
             };
             header?: never;
             path?: never;
@@ -229,6 +259,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectsResponseDto"];
+                };
+            };
+        };
+    };
+    ProjectsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProjectDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectResponseDto"];
                 };
             };
         };
