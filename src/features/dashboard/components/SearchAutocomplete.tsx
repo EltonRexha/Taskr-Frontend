@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { useProjects } from "@/features/projects/hooks/use-projects";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import ProjectIcon from "@/features/projects/components/ProjectIcon";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { useDebounce, useLocalStorage } from "@uidotdev/usehooks";
 import { getPriorityColor } from "@/features/tasks/libs/getPriorityColor";
+import { RecentSearches } from "@/types/RecentSearches";
 
 const popularSearches = ["homepage", "API", "dashboard", "settings"];
 
@@ -23,10 +24,9 @@ export function SearchAutocomplete() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const debouncedQuery = useDebounce(query, 500);
-  const [recentSearches, saveRecentSearches] = useLocalStorage<string[]>(
-    "recentSearches",
-    [],
-  );
+  const [recentSearches, saveRecentSearches] = useLocalStorage<
+    RecentSearches[]
+  >("recentSearches", []);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -79,8 +79,16 @@ export function SearchAutocomplete() {
 
   useEffect(() => {
     saveRecentSearches([
-      ...(tasks?.map((task) => task.description) || []),
-      ...(projects?.map((project) => project.name) || []),
+      ...(tasks?.map(
+        (task) => ({ query: task.description, type: "task" }) as RecentSearches,
+      ) || []),
+      ...(projects?.map(
+        (project) =>
+          ({
+            query: project.name,
+            type: "project",
+          }) as RecentSearches,
+      ) || []),
     ]);
   }, [tasks, projects, saveRecentSearches]);
 
@@ -143,14 +151,14 @@ export function SearchAutocomplete() {
                 <div className="flex flex-wrap gap-1.5">
                   {recentSearches.map((search) => (
                     <button
-                      key={search}
+                      key={search.query}
                       onClick={() => {
-                        setQuery(search);
+                        setQuery(search.query);
                         setIsOpen(true);
                       }}
                       className="px-2 py-1 text-xs rounded-md bg-secondary hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {search}
+                      {search.query}
                     </button>
                   ))}
                 </div>

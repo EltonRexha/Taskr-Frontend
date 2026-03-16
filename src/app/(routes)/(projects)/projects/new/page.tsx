@@ -25,7 +25,7 @@ import Logo from "@/components/Logo";
 import {
   useMutateProjects,
   useProjects,
-} from "@/features/projects/hooks/use-projects";
+} from "@/features/projects/hooks/useProjects";
 import { toast } from "sonner";
 import { useUser } from "@clerk/nextjs";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -176,7 +176,6 @@ export default function NewProjectPage() {
         })),
       });
       router.push("/dashboard");
-      toast.success("Project created successfully!");
     } catch {
       toast.error("Failed to create project. Please try again.");
     }
@@ -245,7 +244,7 @@ function ProjectBasicsStep({
   projectExists: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-6 sm:gap-12">
+    <div className="flex flex-col gap-6 sm:gap-4">
       <div className="flex-1 w-full flex flex-col">
         <div className="space-y-6">
           <div className="flex flex-col gap-2">
@@ -265,12 +264,11 @@ function ProjectBasicsStep({
                 projectExists && name?.trim() && "border-red-500",
               )}
             />
-            {projectExists && name?.trim() && (
-              <p className="text-sm text-red-500">
-                A project with this name already exists. Please choose a
-                different name.
-              </p>
-            )}
+            <p
+              className={`text-sm text-red-500 ${projectExists && name?.trim() && "visible"} invisible`}
+            >
+              You have already created a project with the same name name.
+            </p>
           </div>
         </div>
       </div>
