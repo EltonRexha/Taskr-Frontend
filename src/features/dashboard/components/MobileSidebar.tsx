@@ -19,6 +19,7 @@ import { NavItems } from "../types/nav-items.types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 import { ProjectDto } from "@/features/projects/types/projects.types";
+import { SearchProject } from "./SearchProject";
 
 interface MobileSidebarProps {
   projects: ProjectDto[];
@@ -55,15 +56,7 @@ export function MobileSidebar({ projects, navItems }: MobileSidebarProps) {
           </div>
 
           {/* Search */}
-          <div className="px-3 py-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                className="pl-10 bg-sidebar-accent/50 border-sidebar-border"
-              />
-            </div>
-          </div>
+          <SearchProject />
 
           {/* Nav */}
           <nav className="flex-1 space-y-1 px-3 overflow-y-auto">

@@ -72,7 +72,7 @@ export function ProjectsOverview() {
         <h3 className="font-semibold text-foreground">Projects</h3>
       </div>
 
-      <div className="p-4 space-y-4 lg:max-h-131 overflow-y-auto">
+      <div className="p-4 space-y-4 lg:max-h-124 overflow-y-auto">
         {projects.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">No projects yet</p>

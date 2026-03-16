@@ -25,6 +25,7 @@ export function useProjects(query: ProjectQueryParams) {
     initialPageParam: page,
     select: (data) => ({
       ...data,
+      metadata: data.pages[0].metadata,
       projects: data.pages.flatMap((page) => page.projects),
     }),
   });
