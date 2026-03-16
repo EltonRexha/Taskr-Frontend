@@ -1,5 +1,9 @@
-import { Sidebar } from "@/features/dashboard/components/Sidebar";
+import {
+  Sidebar,
+  SidebarSkeleton,
+} from "@/features/dashboard/components/Sidebar";
 import type React from "react";
+import { Suspense } from "react";
 
 export default function DashboardLayout({
   children,
@@ -8,7 +12,9 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
+      <Suspense fallback={<SidebarSkeleton />}>
+        <Sidebar />
+      </Suspense>
       <main className="lg:pl-64">{children}</main>
     </div>
   );

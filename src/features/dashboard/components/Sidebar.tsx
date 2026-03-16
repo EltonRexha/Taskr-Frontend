@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getActiveDashboardNav } from "../libs/nav-libs";
 import { toast } from "sonner";
 import { SearchProject } from "./SearchProject";
+import { Suspense } from "react";
 
 const SIDEBAR_PROJECT_LIMIT = 10;
 
@@ -50,7 +51,9 @@ export function Sidebar() {
       </div>
 
       {/* Search */}
-      <SearchProject />
+      <Suspense fallback={<Skeleton className="h-8 w-[90%] m-auto my-4" />}>
+        <SearchProject />
+      </Suspense>
 
       {/* Nav + Projects — scrollable */}
       <nav className="flex-1 overflow-y-auto px-3 space-y-1 pb-2">
@@ -165,6 +168,62 @@ export function Sidebar() {
       {/* User dropdown */}
       <div className="border-t border-sidebar-border p-3 shrink-0">
         <UserDropdown />
+      </div>
+    </aside>
+  );
+}
+
+export function SidebarSkeleton() {
+  return (
+    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar hidden lg:flex flex-col">
+      {/* Logo */}
+      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-4 shrink-0">
+        <Skeleton className="h-8 w-24" />
+      </div>
+
+      {/* Search */}
+      <div className="px-3 py-3 shrink-0">
+        <Skeleton className="h-9 w-full rounded-lg" />
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 space-y-1 pb-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-3 rounded-lg px-3 py-2">
+            <Skeleton className="h-4 w-4 rounded-md shrink-0" />
+            <Skeleton className="h-3.5 w-24" />
+          </div>
+        ))}
+
+        {/* Projects section */}
+        <div className="pt-6">
+          <div className="flex items-center justify-between px-3 py-2">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-5 w-5 rounded-md" />
+          </div>
+          <div className="space-y-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2">
+                <Skeleton className="h-2 w-2 rounded-full shrink-0" />
+                <Skeleton
+                  className="h-3.5"
+                  style={{ width: `${50 + (i % 3) * 15}%` }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </nav>
+
+      {/* User */}
+      <div className="border-t border-sidebar-border p-3 shrink-0">
+        <div className="flex items-center gap-3 px-2 py-1.5">
+          <Skeleton className="h-8 w-8 rounded-full shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-2.5 w-32" />
+          </div>
+        </div>
       </div>
     </aside>
   );
