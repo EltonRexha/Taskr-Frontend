@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Users, AlertTriangle } from "lucide-react";
-import { useProjects } from "@/features/projects/hooks/use-projects";
+import { Users, AlertTriangle, Loader2, ChevronDown } from "lucide-react";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useTasksSummary } from "@/features/tasks/hooks/useTaskSummary";
 import type { ProjectDto } from "@/features/projects/types/projects.types";
 
-const PROJECT_LIMIT = 3;
+const PROJECT_LIMIT = 6;
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 // Skeleton placeholder component used when data is loading
 export function ProjectsOverviewSkeleton() {
@@ -44,6 +45,9 @@ export function ProjectsOverview() {
     data: projectsData,
     isLoading: projectsLoading,
     error: projectsError,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useProjects({ limit: PROJECT_LIMIT });
 
   const projects: ProjectDto[] = projectsData?.projects ?? [];
@@ -142,6 +146,28 @@ export function ProjectsOverview() {
           })
         )}
       </div>
+      {hasNextPage && (
+        <div className="border-t border-border">
+          <Button
+            onClick={() => fetchNextPage()}
+            variant="ghost"
+            className="w-full justify-center text-muted-foreground hover:text-foreground"
+            disabled={projectsLoading || !hasNextPage}
+          >
+            {isFetchingNextPage ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                View More
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { useProjects } from "@/features/projects/hooks/use-projects";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import ProjectIcon from "@/features/projects/components/ProjectIcon";
 import { getProjectColorByType } from "@/features/projects/libs/getProjectColorByType";
 import { useTasks } from "@/features/tasks/hooks/useTasks";

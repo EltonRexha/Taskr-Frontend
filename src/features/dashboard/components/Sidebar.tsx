@@ -7,7 +7,7 @@ import { Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserDropdown } from "./UserDropdown";
 import Logo from "@/components/Logo";
-import { useProjects } from "@/features/projects/hooks/use-projects";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getActiveDashboardNav } from "../libs/nav-libs";
 import { toast } from "sonner";
@@ -69,7 +69,7 @@ export function Sidebar() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Projects
               </span>
-              <Link href="/dashboard/projects/new">
+              <Link href="/projects/new">
                 <Button
                   variant="ghost"
                   size="icon"

@@ -3,7 +3,7 @@
 import { MobileSidebar } from "./MobileSidebar";
 import { usePathname } from "next/navigation";
 import { getActiveDashboardNav } from "../libs/nav-libs";
-import { useProjects } from "@/features/projects/hooks/use-projects";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import { toast } from "sonner";
 import { NotificationsDropdown } from "./NotificationDropdown";
 import HeaderSearch from "./HeaderSearch";

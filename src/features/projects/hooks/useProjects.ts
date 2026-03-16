@@ -1,7 +1,9 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import projectApi from "../api/projects.api";
 import { paths } from "@/api/types";
 import { CreateProjectRequest } from "../types/projects.types";
+import { getNextPageParam } from "@/lib/queryUtils";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/lib/constants";
 
 type ProjectQueryParams = paths["/projects"]["get"]["parameters"]["query"];
 
@@ -13,9 +15,18 @@ export const projectQueryKeys = {
 };
 
 export function useProjects(query: ProjectQueryParams) {
-  return useQuery({
+  const limit = query?.limit || DEFAULT_PAGE_SIZE;
+  const page = query?.page || DEFAULT_PAGE;
+  return useInfiniteQuery({
     queryKey: projectQueryKeys.list(JSON.stringify(query)),
-    queryFn: () => projectApi.getProjects(query),
+    queryFn: ({ pageParam }) =>
+      projectApi.getProjects({ ...query, limit, page: pageParam }),
+    getNextPageParam,
+    initialPageParam: page,
+    select: (data) => ({
+      ...data,
+      projects: data.pages.flatMap((page) => page.projects),
+    }),
   });
 }
 
