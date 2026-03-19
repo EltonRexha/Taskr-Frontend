@@ -1,5 +1,12 @@
 import { NavItems } from "../types/nav-items.types";
-import { CheckSquare, FolderKanban, LayoutDashboard } from "lucide-react";
+import {
+  Calendar,
+  CheckSquare,
+  FolderKanban,
+  Kanban,
+  LayoutDashboard,
+  Users,
+} from "lucide-react";
 
 /**
  * A single dashboard navigation group.
@@ -11,6 +18,9 @@ export type DashboardNavGroup = {
 
   /** Navigation items shown when this group is active */
   navItems: NavItems;
+
+  /** Show projects list */
+  showProjects?: boolean;
 };
 
 /**
@@ -20,10 +30,13 @@ export type DashboardNavGroup = {
  * - which routes activate which navigation group
  * - which navigation items should be displayed for that group
  */
-export function getDashboardNavConfig(): DashboardNavGroup[] {
+export function getDashboardNavConfig(
+  options: Record<string, string>,
+): DashboardNavGroup[] {
   return [
     {
       matchRoute: "/dashboard",
+      showProjects: true,
       navItems: [
         {
           href: "/dashboard",
@@ -39,6 +52,37 @@ export function getDashboardNavConfig(): DashboardNavGroup[] {
           href: "/dashboard/projects",
           icon: FolderKanban,
           label: "Projects",
+        },
+      ],
+    },
+    {
+      matchRoute: "/projects",
+      showProjects: true,
+      navItems: [
+        {
+          href: "/dashboard",
+          icon: LayoutDashboard,
+          label: "Dashboard",
+        },
+        {
+          href: `/projects/${options.id}/board`,
+          icon: Kanban,
+          label: "Board",
+        },
+        {
+          href: `/projects/${options.id}/calendar`,
+          icon: Calendar,
+          label: "Calendar",
+        },
+        {
+          href: `/projects/${options.id}/team`,
+          icon: Users,
+          label: "Team",
+        },
+        {
+          href: "/dashboard/tasks",
+          icon: CheckSquare,
+          label: "My Tasks",
         },
       ],
     },
@@ -58,8 +102,11 @@ export function getDashboardNavConfig(): DashboardNavGroup[] {
  * // { matchRoute: "/dashboard", navItems: [{ href: "/dashboard/projects", icon: FolderKanban, label: "Projects" }] }
  * ```
  */
-export function getActiveDashboardNav(pathname: string) {
-  const navConfig = getDashboardNavConfig();
+export function getActiveDashboardNav(
+  pathname: string,
+  options?: Record<string, string>,
+) {
+  const navConfig = getDashboardNavConfig(options ? options : {});
 
   return navConfig.find((group) => pathname.includes(group.matchRoute));
 }

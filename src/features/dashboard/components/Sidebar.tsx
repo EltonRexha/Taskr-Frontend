@@ -15,7 +15,11 @@ import { Suspense } from "react";
 
 const SIDEBAR_PROJECT_LIMIT = 10;
 
-export function Sidebar() {
+export function Sidebar({
+  urlNavOptions,
+}: {
+  urlNavOptions?: Record<string, string>;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const projectNameFilter = searchParams.get("projectName") ?? undefined;
@@ -32,7 +36,9 @@ export function Sidebar() {
     project_name_like: projectNameFilter,
   });
 
-  const navItems = getActiveDashboardNav(pathname)?.navItems;
+  const nav = getActiveDashboardNav(pathname, urlNavOptions);
+  const navItems = nav?.navItems;
+  const showProjects = !!nav?.showProjects;
   const projects = data?.projects ?? [];
 
   if (!navItems) {
@@ -79,7 +85,7 @@ export function Sidebar() {
         })}
 
         {/* Projects section */}
-        <div className="pt-6">
+        <div className={`pt-6 ${showProjects ? "block" : "hidden"}`}>
           <div className="flex items-center justify-between px-3 py-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {projectNameFilter ? `"${projectNameFilter}"` : "Projects"}{" "}
@@ -118,7 +124,7 @@ export function Sidebar() {
                 return (
                   <Link
                     key={project.id}
-                    href={`/dashboard/projects/${project.id}`}
+                    href={`/projects/${project.id}`}
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors group",
                       isActive
