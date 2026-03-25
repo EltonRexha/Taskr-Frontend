@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -21,54 +21,70 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
-import {
-  type Task,
-  type TaskStatus,
-  type TaskOrderUpdate,
-  getTasksBySprint,
-  getActiveSprint,
-  saveTaskOrder,
-  getBacklogTasks,
-} from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   MoreHorizontal,
   Plus,
   GripVertical,
-  Check,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTasks } from "@/features/tasks/hooks/useTasks";
+import { TaskDto, TaskStatus } from "@/features/tasks/types/tasks.types";
 
 interface ScrumBoardProps {
   projectId: string;
 }
 
+// Fetch all tasks in one go — pagination handled by the infinite query internally
+const TASK_LIMIT = 1000;
+
+// API status values are uppercase
 const columns: { id: TaskStatus; label: string; color: string }[] = [
-  { id: "todo", label: "To Do", color: "bg-blue-500" },
-  { id: "in-progress", label: "In Progress", color: "bg-yellow-500" },
-  { id: "review", label: "In Review", color: "bg-purple-500" },
-  { id: "done", label: "Done", color: "bg-green-500" },
+  { id: "TODO", label: "To Do", color: "bg-blue-500" },
+  { id: "IN_PROGRESS", label: "In Progress", color: "bg-yellow-500" },
+  { id: "IN_REVIEW", label: "In Review", color: "bg-purple-500" },
+  { id: "DONE", label: "Done", color: "bg-green-500" },
 ];
 
-// Every valid drop zone — columns + backlog
 const ALL_ZONE_IDS: TaskStatus[] = [
-  "backlog",
-  "todo",
-  "in-progress",
-  "review",
-  "done",
+  "BACKLOG",
+  "TODO",
+  "IN_PROGRESS",
+  "IN_REVIEW",
+  "DONE",
 ];
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getTaskStatus(task: TaskDto): TaskStatus | null {
+  return task.metaData?.status ?? null;
+}
+
+// Pull the first assigned user's display name and avatar
+function getAssignee(task: TaskDto) {
+  const first = task.assignedTo?.[0]?.user;
+  if (!first) return null;
+  const name = [first.firstName, first.lastName].filter(Boolean).join(" ");
+  return { name, avatar: first.profileImage };
+}
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
 
 // ─── SortableTaskItem ─────────────────────────────────────────────────────────
 
 interface SortableTaskProps {
-  task: Task;
+  task: TaskDto;
   isDragging: boolean;
-  compact?: boolean; // compact = smaller horizontal card used in the backlog strip
+  compact?: boolean;
 }
 
 function SortableTaskItem({
@@ -79,10 +95,8 @@ function SortableTaskItem({
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({ id: task.id });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  const style = { transform: CSS.Transform.toString(transform), transition };
+  const assignee = getAssignee(task);
 
   if (compact) {
     return (
@@ -98,34 +112,23 @@ function SortableTaskItem({
         )}
       >
         <div className="flex items-start justify-between mb-1.5">
-          <span className="text-xs text-muted-foreground font-mono">
-            {task.key}
+          <span className="text-xs text-muted-foreground font-mono truncate max-w-[80%]">
+            {task.label || task.id.slice(0, 8)}
           </span>
-          <GripVertical className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+          <GripVertical className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
         </div>
         <h4 className="text-xs font-medium text-foreground line-clamp-2 mb-2">
           {task.title}
         </h4>
         <div className="flex items-center justify-between">
-          {task.storyPoints && (
-            <Badge
-              variant="secondary"
-              className="bg-primary/20 text-primary text-xs h-4 px-1.5"
-            >
-              {task.storyPoints} SP
-            </Badge>
-          )}
-          {task.assignee && (
+          <span className="text-xs text-muted-foreground capitalize">
+            {task.priority?.toLowerCase()}
+          </span>
+          {assignee && (
             <Avatar className="h-5 w-5">
-              <AvatarImage
-                src={task.assignee.avatar || "/placeholder.svg"}
-                alt={task.assignee.name}
-              />
+              <AvatarImage src={assignee.avatar} alt={assignee.name} />
               <AvatarFallback className="text-xs">
-                {task.assignee.name
-                  .split(" ")
-                  .map((n: string) => n[0])
-                  .join("")}
+                {getInitials(assignee.name)}
               </AvatarFallback>
             </Avatar>
           )}
@@ -147,8 +150,8 @@ function SortableTaskItem({
       )}
     >
       <div className="flex items-start justify-between mb-2">
-        <span className="text-xs text-muted-foreground font-mono">
-          {task.key}
+        <span className="text-xs text-muted-foreground font-mono truncate max-w-[75%]">
+          {task.label || task.id.slice(0, 8)}
         </span>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -157,31 +160,20 @@ function SortableTaskItem({
           </Button>
         </div>
       </div>
+
       <h4 className="text-sm font-medium text-foreground mb-3 line-clamp-2">
         {task.title}
       </h4>
+
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {task.storyPoints && (
-            <Badge
-              variant="secondary"
-              className="bg-primary/20 text-primary text-xs"
-            >
-              {task.storyPoints} SP
-            </Badge>
-          )}
-        </div>
-        {task.assignee && (
+        <span className="text-xs text-muted-foreground capitalize">
+          {task.priority?.toLowerCase()}
+        </span>
+        {assignee && (
           <Avatar className="h-6 w-6">
-            <AvatarImage
-              src={task.assignee.avatar || "/placeholder.svg"}
-              alt={task.assignee.name}
-            />
+            <AvatarImage src={assignee.avatar} alt={assignee.name} />
             <AvatarFallback className="text-xs">
-              {task.assignee.name
-                .split(" ")
-                .map((n: string) => n[0])
-                .join("")}
+              {getInitials(assignee.name)}
             </AvatarFallback>
           </Avatar>
         )}
@@ -190,11 +182,13 @@ function SortableTaskItem({
   );
 }
 
+// ─── DroppableColumn ──────────────────────────────────────────────────────────
+
 interface DroppableColumnProps {
   id: TaskStatus;
   label: string;
   color: string;
-  tasks: Task[];
+  tasks: TaskDto[];
   isDraggingOver: boolean;
   activeId: string | null;
 }
@@ -227,7 +221,7 @@ function DroppableColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          "space-y-3 min-h-50 rounded-lg bg-secondary/30 p-2 transition-colors",
+          "space-y-3 min-h-64 rounded-lg bg-secondary/30 p-2 transition-colors",
           isDraggingOver && "bg-primary/10",
         )}
       >
@@ -254,8 +248,10 @@ function DroppableColumn({
   );
 }
 
+// ─── BacklogSection ───────────────────────────────────────────────────────────
+
 interface BacklogSectionProps {
-  tasks: Task[];
+  tasks: TaskDto[];
   isDraggingOver: boolean;
   activeId: string | null;
 }
@@ -265,14 +261,11 @@ function BacklogSection({
   isDraggingOver,
   activeId,
 }: BacklogSectionProps) {
-  const { setNodeRef } = useDroppable({ id: "backlog" });
+  const { setNodeRef } = useDroppable({ id: "BACKLOG" });
   const [collapsed, setCollapsed] = useState(false);
-
-  const backlogPoints = tasks.reduce((sum, t) => sum + (t.storyPoints || 0), 0);
 
   return (
     <div className="mt-8 border-t border-border pt-6">
-      {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <button
           onClick={() => setCollapsed((c) => !c)}
@@ -287,22 +280,12 @@ function BacklogSection({
           <span className="text-xs text-muted-foreground rounded-full bg-secondary px-2 py-0.5">
             {tasks.length}
           </span>
-          {backlogPoints > 0 && (
-            <span className="text-xs text-muted-foreground">
-              · {backlogPoints} pts
-            </span>
-          )}
         </button>
         <Button variant="ghost" size="icon" className="h-6 w-6">
           <Plus className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
 
-      {/*
-        Drop zone is only rendered when expanded. The ref is attached here so
-        dropping onto the empty-state placeholder or the card strip both register
-        as a drop on the "backlog" zone.
-      */}
       {!collapsed && (
         <div
           ref={setNodeRef}
@@ -326,7 +309,6 @@ function BacklogSection({
               items={tasks.map((t) => t.id)}
               strategy={verticalListSortingStrategy}
             >
-              {/* Horizontally scrollable strip of compact cards */}
               <div className="flex gap-3 overflow-x-auto pb-1">
                 {tasks.map((task) => (
                   <SortableTaskItem
@@ -345,12 +327,14 @@ function BacklogSection({
   );
 }
 
-function TaskDragOverlay({ task }: { task: Task | null }) {
+// ─── TaskDragOverlay ──────────────────────────────────────────────────────────
+
+function TaskDragOverlay({ task }: { task: TaskDto | null }) {
   if (!task) return null;
   return (
     <div className="rounded-lg border border-border bg-card p-3 shadow-lg opacity-90 pointer-events-none max-w-xs">
       <span className="text-xs text-muted-foreground font-mono block mb-2">
-        {task.key}
+        {task.label || task.id.slice(0, 8)}
       </span>
       <h4 className="text-sm font-medium text-foreground line-clamp-2">
         {task.title}
@@ -359,35 +343,34 @@ function TaskDragOverlay({ task }: { task: Task | null }) {
   );
 }
 
-export function ScrumBoard({ projectId }: ScrumBoardProps) {
-  const activeSprint = getActiveSprint(projectId);
-  // sprintTasks = flat mocked Task[]. All tasks start with status: "backlog".
-  const sprintTasks = activeSprint ? getTasksBySprint(activeSprint.id) : [];
+// ─── ScrumBoard (root) ────────────────────────────────────────────────────────
 
+function emptyBoard(): Record<TaskStatus, TaskDto[]> {
+  return { BACKLOG: [], TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] };
+}
+
+export function ScrumBoard({ projectId }: ScrumBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [tasksByStatus, setTasksByStatus] =
+    useState<Record<TaskStatus, TaskDto[]>>(emptyBoard);
 
-  const backlogTasks = getBacklogTasks(projectId);
-
-  const [tasksByStatus, setTasksByStatus] = useState<
-    Record<TaskStatus, Task[]>
-  >(() => {
-    // Start every bucket empty, then distribute by each task's actual status.
-    // With mocked data where all tasks are status:"backlog", they all land here.
-    const grouped: Record<TaskStatus, Task[]> = {
-      backlog: backlogTasks,
-      todo: [],
-      "in-progress": [],
-      review: [],
-      done: [],
-    };
-    sprintTasks.forEach((task: Task) => {
-      grouped[task.status]?.push(task);
-    });
-    return grouped;
+  const { data, isLoading, isError } = useTasks({
+    project_id: projectId,
+    limit: TASK_LIMIT,
   });
+
+  // Sync server data into local drag-and-drop state whenever the query result changes.
+  // Local moves are reflected immediately; this effect re-syncs if the server data refreshes.
+  useEffect(() => {
+    if (!data?.tasks) return;
+    const grouped = emptyBoard();
+    data.tasks.forEach((task) => {
+      const status = getTaskStatus(task);
+      if (status) grouped[status].push(task);
+    });
+    setTasksByStatus(grouped);
+  }, [data?.tasks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -406,13 +389,13 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
       setDragOverColumn(null);
       return;
     }
-    // Cursor directly over a zone (column or backlog)?
+
     const overZone = ALL_ZONE_IDS.find((id) => id === over.id);
     if (overZone) {
       setDragOverColumn(overZone);
       return;
     }
-    // Cursor over a task — find which zone owns it
+
     for (const [status, tasks] of Object.entries(tasksByStatus)) {
       if (tasks.some((t) => t.id === over.id)) {
         setDragOverColumn(status as TaskStatus);
@@ -439,18 +422,16 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
         break;
       }
     }
-    if (sourceStatus === null || sourceIndex === -1) return;
+    if (!sourceStatus || sourceIndex === -1) return;
 
     // Find target
     let targetStatus: TaskStatus | null = null;
     let targetIndex = -1;
     const overZone = ALL_ZONE_IDS.find((id) => id === over.id);
     if (overZone) {
-      // Dropped onto empty zone space → append
       targetStatus = overZone;
       targetIndex = tasksByStatus[targetStatus]?.length ?? 0;
     } else {
-      // Dropped onto another task → insert at that position
       for (const [status, tasks] of Object.entries(tasksByStatus)) {
         const index = tasks.findIndex((t) => t.id === over.id);
         if (index !== -1) {
@@ -460,7 +441,7 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
         }
       }
     }
-    if (targetStatus === null || targetIndex === -1) return;
+    if (!targetStatus || targetIndex === -1) return;
 
     setTasksByStatus((prev) => {
       const next = { ...prev };
@@ -475,8 +456,14 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
         const tgtArr = [...next[targetStatus!]];
         const [moved] = srcArr.splice(sourceIndex, 1);
         if (moved) {
-          moved.status = targetStatus!;
-          tgtArr.splice(targetIndex, 0, moved);
+          // status lives inside metaData — update it there
+          const updatedMoved: TaskDto = {
+            ...moved,
+            metaData: moved.metaData
+              ? { ...moved.metaData, status: targetStatus! }
+              : undefined,
+          };
+          tgtArr.splice(targetIndex, 0, updatedMoved);
         }
         next[sourceStatus!] = srcArr;
         next[targetStatus!] = tgtArr;
@@ -484,43 +471,12 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
       return next;
     });
 
-    setHasChanges(true);
+    // TODO: call your PATCH /tasks/:id endpoint here to persist the status change
+    // e.g. taskApi.updateTask(active.id as string, { status: targetStatus })
   };
 
-  const handleSaveOrder = async () => {
-    setIsSaving(true);
-    try {
-      const updates: TaskOrderUpdate[] = [];
-      Object.entries(tasksByStatus).forEach(([status, tasks]) => {
-        tasks.forEach((task, index) => {
-          updates.push({
-            taskId: task.id,
-            status: status as TaskStatus,
-            order: index,
-          });
-        });
-      });
-      await saveTaskOrder(updates);
-      setHasChanges(false);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const totalPoints = [
-    ...tasksByStatus.todo,
-    ...tasksByStatus["in-progress"],
-    ...tasksByStatus.review,
-    ...tasksByStatus.done,
-  ].reduce((sum, t) => sum + (t.storyPoints || 0), 0);
-
-  const completedPoints = tasksByStatus.done.reduce(
-    (sum, t) => sum + (t.storyPoints || 0),
-    0,
-  );
-
-  // Look up the dragged task from live state
-  let activeDraggedTask: Task | undefined;
+  // Find the task currently being dragged from live state
+  let activeDraggedTask: TaskDto | undefined;
   if (activeId) {
     for (const tasks of Object.values(tasksByStatus)) {
       const found = tasks.find((t) => t.id === activeId);
@@ -531,79 +487,35 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
     }
   }
 
-  if (!activeSprint) {
+  const allDraggableIds = [
+    ...Object.values(tasksByStatus)
+      .flat()
+      .map((t) => t.id),
+    ...ALL_ZONE_IDS,
+  ];
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">No active sprint</p>
-          <Button className="bg-primary text-primary-foreground">
-            Start Sprint
-          </Button>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-sm text-muted-foreground animate-pulse">
+          Loading board…
+        </p>
       </div>
     );
   }
 
-  const allDraggableIds = [
-    ...sprintTasks.map((t) => t.id),
-    ...(tasksByStatus.backlog ?? []).map((t) => t.id),
-    ...ALL_ZONE_IDS,
-  ];
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-sm text-destructive">
+          Failed to load tasks. Please try again.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
-      {/* Sprint Info Bar */}
-      <div className="mb-6 flex items-center justify-between rounded-lg bg-secondary/50 p-4">
-        <div>
-          <h3 className="font-semibold text-foreground">{activeSprint.name}</h3>
-          <p className="text-sm text-muted-foreground">{activeSprint.goal}</p>
-        </div>
-        <div className="flex items-center gap-6">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-foreground">
-              {completedPoints}/{totalPoints}
-            </p>
-            <p className="text-xs text-muted-foreground">Story Points</p>
-          </div>
-          <div className="text-center">
-            <p className="text-2xl font-bold text-foreground">
-              {tasksByStatus.done.length}
-            </p>
-            <p className="text-xs text-muted-foreground">Tasks Done</p>
-          </div>
-          <div className="h-8 w-32">
-            <div className="h-2 rounded-full bg-secondary">
-              <div
-                className="h-full rounded-full bg-primary transition-all"
-                style={{
-                  width: `${totalPoints > 0 ? (completedPoints / totalPoints) * 100 : 0}%`,
-                }}
-              />
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {totalPoints > 0
-                ? Math.round((completedPoints / totalPoints) * 100)
-                : 0}
-              % complete
-            </p>
-          </div>
-          {hasChanges && (
-            <Button
-              onClick={handleSaveOrder}
-              disabled={isSaving}
-              className="bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Check className="mr-2 h-4 w-4" />
-              {isSaving ? "Saving..." : "Save Order"}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/*
-        One DndContext wraps BOTH the board columns and the backlog so
-        dragging across the boundary works seamlessly.
-      */}
       <DndContext
         sensors={sensors}
         collisionDetection={rectIntersection}
@@ -630,9 +542,10 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
             ))}
           </div>
 
+          {/* Backlog strip */}
           <BacklogSection
-            tasks={tasksByStatus.backlog ?? []}
-            isDraggingOver={dragOverColumn === "backlog"}
+            tasks={tasksByStatus.BACKLOG ?? []}
+            isDraggingOver={dragOverColumn === "BACKLOG"}
             activeId={activeId}
           />
         </SortableContext>

@@ -4,6 +4,7 @@ import {
   GetProjectsResponse,
   CreateProjectRequest,
   CreateProjectResponse,
+  FindOneProjectResponse,
 } from "../types/projects.types";
 
 const projectApi = {
@@ -16,6 +17,10 @@ const projectApi = {
   createProject: async (data: CreateProjectRequest) => {
     const response = await api.post<CreateProjectResponse>("/projects", data);
     return response.data;
+  },
+  findOne: async (id: string) => {
+    const response = await api.get<FindOneProjectResponse>(`/projects/${id}`);
+    return response;
   },
 };
 

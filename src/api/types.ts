@@ -4,491 +4,493 @@
  */
 
 export interface paths {
-  "/webhooks/clerk": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/webhooks/clerk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["WebhooksController_handleClerk"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    post: operations["WebhooksController_handleClerk"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/projects": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_findAll"];
+        put?: never;
+        post: operations["ProjectsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["ProjectsController_findAll"];
-    put?: never;
-    post: operations["ProjectsController_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/projects/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["ProjectsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ProjectsController_update"];
+        trace?: never;
     };
-    get: operations["ProjectsController_findOne"];
-    put?: never;
-    post?: never;
-    delete: operations["ProjectsController_remove"];
-    options?: never;
-    head?: never;
-    patch: operations["ProjectsController_update"];
-    trace?: never;
-  };
-  "/tasks": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TasksController_findAll"];
+        put?: never;
+        post: operations["TasksController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["TasksController_findAll"];
-    put?: never;
-    post: operations["TasksController_create"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/tasks/summary": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tasks/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TasksController_getTasksSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["TasksController_getTasksSummary"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/tasks/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TasksController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["TasksController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["TasksController_update"];
+        trace?: never;
     };
-    get: operations["TasksController_findOne"];
-    put?: never;
-    post?: never;
-    delete: operations["TasksController_remove"];
-    options?: never;
-    head?: never;
-    patch: operations["TasksController_update"];
-    trace?: never;
-  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    InviteMemberDto: {
-      /** @description The email of the member to invite */
-      email: string;
-      /** @description The role of the member to invite */
-      role: string;
+    schemas: {
+        InviteMemberDto: {
+            /** @description The email of the member to invite */
+            email: string;
+            /** @description The role of the member to invite */
+            role: string;
+        };
+        CreateProjectDto: {
+            /** @description The name of the project */
+            name: string;
+            /** @description The type of the project */
+            type: string;
+            /** @description The members to invite to the project */
+            invites: components["schemas"]["InviteMemberDto"][];
+        };
+        ProjectMemberDto: {
+            userClerkId: string;
+            /** @enum {string} */
+            role: "ADMIN" | "MEMBER" | "VIEWER";
+        };
+        ProjectResponseDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            projectType: "SCRUM" | "KANBAN";
+            members: components["schemas"]["ProjectMemberDto"][];
+            createdAt: string;
+            updatedAt: string;
+        };
+        ProjectDto: {
+            id: string;
+            name: string;
+            /** @enum {string} */
+            projectType: "SCRUM" | "KANBAN";
+            createdAt: string;
+            updatedAt: string;
+        };
+        ResponsePaginationDto: {
+            /** @description Total number of records */
+            total: number;
+            /** @description Current page number (1-based) */
+            page: number;
+            /** @description Number of items per page */
+            limit: number;
+            /** @description Total number of pages */
+            totalPages: number;
+            /** @description Whether a next page exists */
+            hasNextPage: boolean;
+            /** @description Whether a previous page exists */
+            hasPreviousPage: boolean;
+        };
+        ProjectsResponseDto: {
+            projects: components["schemas"]["ProjectDto"][];
+            metadata: components["schemas"]["ResponsePaginationDto"];
+        };
+        UserDto: {
+            /** @example john.doe@example.com */
+            email: string;
+            /** @example John */
+            firstName: string;
+            /** @example Doe */
+            lastName?: Record<string, never> | null;
+            /** @example https://example.com/avatar.jpg */
+            profileImage: string;
+        };
+        AssignedToDto: {
+            user: components["schemas"]["UserDto"];
+        };
+        TaskProjectDto: {
+            id: string;
+            name: string;
+        };
+        TaskMetaDto: {
+            id: string;
+            /** @enum {string} */
+            status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE" | "BACKLOG";
+            /** @enum {string} */
+            type: "SCRUM" | "KANBAN";
+        };
+        TaskDto: {
+            id: string;
+            description: string;
+            title: string;
+            label: string;
+            priority: string;
+            startDate: string;
+            dueDate: string;
+            createdAt: string;
+            updatedAt: string;
+            /** @description List of assigned users */
+            assignedTo: components["schemas"]["AssignedToDto"][];
+            project: components["schemas"]["TaskProjectDto"];
+            metaData?: components["schemas"]["TaskMetaDto"];
+        };
+        TasksResponseDto: {
+            tasks: components["schemas"]["TaskDto"][];
+            metadata: components["schemas"]["ResponsePaginationDto"];
+        };
+        TaskSummaryResponseDto: {
+            TODO: number;
+            IN_PROGRESS: number;
+            IN_REVIEW: number;
+            DONE: number;
+            overdueTasks: number;
+            memberCount: number;
+        };
     };
-    CreateProjectDto: {
-      /** @description The name of the project */
-      name: string;
-      /** @description The type of the project */
-      type: string;
-      /** @description The members to invite to the project */
-      invites: components["schemas"]["InviteMemberDto"][];
-    };
-    ProjectMemberDto: {
-      userClerkId: string;
-      /** @enum {string} */
-      role: "ADMIN" | "MEMBER" | "VIEWER";
-    };
-    ProjectResponseDto: {
-      id: string;
-      name: string;
-      /** @enum {string} */
-      projectType: "SCRUM" | "KANBAN";
-      members: components["schemas"]["ProjectMemberDto"][];
-      createdAt: string;
-      updatedAt: string;
-    };
-    ProjectDto: {
-      id: string;
-      name: string;
-      /** @enum {string} */
-      projectType: "SCRUM" | "KANBAN";
-      createdAt: string;
-      updatedAt: string;
-    };
-    ResponsePaginationDto: {
-      /** @description Total number of records */
-      total: number;
-      /** @description Current page number (1-based) */
-      page: number;
-      /** @description Number of items per page */
-      limit: number;
-      /** @description Total number of pages */
-      totalPages: number;
-      /** @description Whether a next page exists */
-      hasNextPage: boolean;
-      /** @description Whether a previous page exists */
-      hasPreviousPage: boolean;
-    };
-    ProjectsResponseDto: {
-      projects: components["schemas"]["ProjectDto"][];
-      metadata: components["schemas"]["ResponsePaginationDto"];
-    };
-    UserDto: {
-      /** @example john.doe@example.com */
-      email: string;
-      /** @example John */
-      firstName: string;
-      /** @example Doe */
-      lastName?: Record<string, never> | null;
-      /** @example https://example.com/avatar.jpg */
-      profileImage: string;
-    };
-    AssignedToDto: {
-      user: components["schemas"]["UserDto"];
-    };
-    TaskProjectDto: {
-      id: string;
-      name: string;
-    };
-    TaskMetaDto: {
-      id: string;
-      /** @enum {string} */
-      status: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
-      /** @enum {string} */
-      type: "SCRUM" | "KANBAN";
-    };
-    TaskDto: {
-      id: string;
-      description: string;
-      title: string;
-      label: string;
-      priority: string;
-      startDate: string;
-      dueDate: string;
-      createdAt: string;
-      updatedAt: string;
-      /** @description List of assigned users */
-      assignedTo: components["schemas"]["AssignedToDto"][];
-      project: components["schemas"]["TaskProjectDto"];
-      metaData?: components["schemas"]["TaskMetaDto"];
-    };
-    TasksResponseDto: {
-      tasks: components["schemas"]["TaskDto"][];
-      metadata: components["schemas"]["ResponsePaginationDto"];
-    };
-    TaskSummaryResponseDto: {
-      TODO: number;
-      IN_PROGRESS: number;
-      IN_REVIEW: number;
-      DONE: number;
-      overdueTasks: number;
-      memberCount: number;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  WebhooksController_handleClerk: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+    WebhooksController_handleClerk: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  ProjectsController_findAll: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Number of items per page */
-        limit?: number;
-        /** @description Filter by project name */
-        project_name?: string;
-        /** @description Filter by project name */
-        project_name_like?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content: {
-          "application/json": components["schemas"]["ProjectsResponseDto"];
+    };
+    ProjectsController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Number of items per page */
+                limit?: number;
+                /** @description Filter by project name */
+                project_name?: string;
+                /** @description Filter by project name */
+                project_name_like?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  ProjectsController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateProjectDto"];
-      };
-    };
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectsResponseDto"];
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["ProjectResponseDto"];
+    };
+    ProjectsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-    };
-  };
-  ProjectsController_findOne: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProjectDto"];
+            };
         };
-        content?: never;
-      };
-    };
-  };
-  ProjectsController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectResponseDto"];
+                };
+            };
         };
-        content?: never;
-      };
     };
-  };
-  ProjectsController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ProjectsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  TasksController_findAll: {
-    parameters: {
-      query?: {
-        /** @description Page number */
-        page?: number;
-        /** @description Number of items per page */
-        limit?: number;
-        /** @description Filter by task description */
-        description?: string;
-        /** @description Filter by task title */
-        title?: string;
-        /** @description Filter by project name */
-        project_name?: string;
-        /** @description Filter by label */
-        label?: string;
-        /** @description Filter by priority (e.g., HIGH, LOW) */
-        priority?: string;
-        /** @description Filter by project ID */
-        project_id?: string;
-        /** @description Filter by project type (e.g., SCRUM, KANBAN) */
-        type?: string;
-        /** @description Filter by Scrum task status (TODO, IN_PROGRESS, IN_REVIEW, DONE) */
-        status?: string;
-        /** @description Filter tasks starting from this date */
-        start_date?: string;
-        /** @description Filter tasks starting after or equal to this date */
-        start_date_gte?: string;
-        /** @description Filter tasks starting before or equal to this date */
-        start_date_lte?: string;
-        /** @description Filter tasks due by this date */
-        due_date?: string;
-        /** @description Filter tasks due before or equal to this date */
-        due_date_lte?: string;
-        /** @description Sort by fields in format field:order (e.g., priority:desc) */
-        sort_by?: string[];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectResponseDto"];
+                };
+            };
         };
-        content: {
-          "application/json": components["schemas"]["TasksResponseDto"];
+    };
+    ProjectsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-      };
-    };
-  };
-  TasksController_create: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      201: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-        content?: never;
-      };
     };
-  };
-  TasksController_getTasksSummary: {
-    parameters: {
-      query: {
-        /** @description Project ID */
-        projectId: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    ProjectsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
         };
-        content: {
-          "application/json": components["schemas"]["TaskSummaryResponseDto"];
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
         };
-      };
     };
-  };
-  TasksController_findOne: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    TasksController_findAll: {
+        parameters: {
+            query?: {
+                /** @description Page number */
+                page?: number;
+                /** @description Number of items per page */
+                limit?: number;
+                /** @description Filter by task description */
+                description?: string;
+                /** @description Filter by task title */
+                title?: string;
+                /** @description Filter by project name */
+                project_name?: string;
+                /** @description Filter by label */
+                label?: string;
+                /** @description Filter by priority (e.g., HIGH, LOW) */
+                priority?: string;
+                /** @description Filter by project ID */
+                project_id?: string;
+                /** @description Filter by project type (e.g., SCRUM, KANBAN) */
+                type?: string;
+                /** @description Filter by Scrum task status (TODO, IN_PROGRESS, IN_REVIEW, DONE) */
+                status?: string;
+                /** @description Filter tasks starting from this date */
+                start_date?: string;
+                /** @description Filter tasks starting after or equal to this date */
+                start_date_gte?: string;
+                /** @description Filter tasks starting before or equal to this date */
+                start_date_lte?: string;
+                /** @description Filter tasks due by this date */
+                due_date?: string;
+                /** @description Filter tasks due before or equal to this date */
+                due_date_lte?: string;
+                /** @description Sort by fields in format field:order (e.g., priority:desc) */
+                sort_by?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
-    };
-  };
-  TasksController_remove: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TasksResponseDto"];
+                };
+            };
         };
-        content?: never;
-      };
     };
-  };
-  TasksController_update: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
+    TasksController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-        content?: never;
-      };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
     };
-  };
+    TasksController_getTasksSummary: {
+        parameters: {
+            query: {
+                /** @description Project ID */
+                projectId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskSummaryResponseDto"];
+                };
+            };
+        };
+    };
+    TasksController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TasksController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TasksController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
 }

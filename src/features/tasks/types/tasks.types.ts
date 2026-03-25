@@ -1,4 +1,4 @@
-import { paths, operations } from "@/api/types";
+import { paths, operations, components } from "@/api/types";
 
 export type TaskQueryParams = paths["/tasks"]["get"]["parameters"]["query"];
 export type TasksResponse =
@@ -11,3 +11,5 @@ export type TaskSummaryQueryParams =
 
 export type TaskSummaryResponse =
   operations["TasksController_getTasksSummary"]["responses"]["200"]["content"]["application/json"];
+
+export type TaskStatus = components["schemas"]["TaskMetaDto"]["status"];

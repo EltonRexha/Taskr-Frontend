@@ -1,36 +1,25 @@
 "use client";
 
-import { type Project, getActiveSprint } from "@/lib/data";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Settings,
-  Users,
-  Plus,
-  Filter,
-  Search,
-  Kanban,
-  Repeat,
-} from "lucide-react";
+import { Settings, Users, Plus, Filter, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FindOneProjectResponse } from "../types/projects.types";
+import { getProjectColorByType } from "../libs/getProjectColorByType";
 
 interface ProjectHeaderProps {
-  project: Project;
+  project: FindOneProjectResponse;
 }
 
 export function ProjectHeader({ project }: ProjectHeaderProps) {
   const pathname = usePathname();
-  const activeSprint =
-    project.type === "scrum" ? getActiveSprint(project.id) : null;
 
   const basePath = `/dashboard/projects/${project.id}`;
 
   const tabs =
-    project.type === "kanban"
+    project.projectType === "KANBAN"
       ? [
           { value: "board", label: "Board", href: basePath },
           { value: "backlog", label: "Backlog", href: `${basePath}/backlog` },
@@ -77,40 +66,25 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
           <div className="flex items-center gap-4">
             <div
               className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-              style={{ backgroundColor: `${project.color}20` }}
-            >
-              {project.icon}
-            </div>
+              style={{
+                backgroundColor: `${getProjectColorByType(project.projectType)}20`,
+              }}
+            ></div>
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-foreground">
                   {project.name}
                 </h1>
-                <Badge
-                  variant="secondary"
-                  className={`${
-                    project.type === "kanban"
-                      ? "bg-orange-500/20 text-orange-400"
-                      : "bg-green-500/20 text-green-400"
-                  }`}
-                >
-                  {project.type === "kanban" ? (
-                    <Kanban className="mr-1 h-3 w-3" />
-                  ) : (
-                    <Repeat className="mr-1 h-3 w-3" />
-                  )}
-                  {project.type.charAt(0).toUpperCase() + project.type.slice(1)}
-                </Badge>
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {project.description}
+                {project.projectType}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
-              {project.members.slice(0, 4).map((member) => (
+              {/* {project.members.slice(0, 4).map((member) => (
                 <Avatar
                   key={member.id}
                   className="h-8 w-8 border-2 border-background"
@@ -126,7 +100,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
-              ))}
+              ))} */}
             </div>
             <Button
               variant="outline"
@@ -141,32 +115,6 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
             </Button>
           </div>
         </div>
-
-        {/* Active Sprint Banner for Scrum */}
-        {project.type === "scrum" && activeSprint && (
-          <div className="mt-4 rounded-lg bg-primary/10 border border-primary/20 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Repeat className="h-5 w-5 text-primary" />
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  {activeSprint.name} is active
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {activeSprint.goal}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>
-                Ends{" "}
-                {new Date(activeSprint.endDate).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Tabs and filters */}

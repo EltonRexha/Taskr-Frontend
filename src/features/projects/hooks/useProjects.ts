@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import projectApi from "../api/projects.api";
 import { paths } from "@/api/types";
 import { CreateProjectRequest } from "../types/projects.types";
@@ -12,6 +12,7 @@ export const projectQueryKeys = {
   list: (stringifiedQuery: string) =>
     [...projectQueryKeys.all, "list", stringifiedQuery] as const,
   create: () => [...projectQueryKeys.all, "create"] as const,
+  findOne: (id: string) => [...projectQueryKeys.all, "findOne", id],
 };
 
 export function useProjects(query: ProjectQueryParams) {
@@ -28,6 +29,13 @@ export function useProjects(query: ProjectQueryParams) {
       metadata: data.pages[0].metadata,
       projects: data.pages.flatMap((page) => page.projects),
     }),
+  });
+}
+
+export function useQueryProjectById(id: string) {
+  return useQuery({
+    queryKey: projectQueryKeys.findOne(id),
+    queryFn: () => projectApi.findOne(id),
   });
 }
 
