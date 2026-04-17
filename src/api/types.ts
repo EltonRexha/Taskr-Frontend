@@ -352,6 +352,8 @@ export interface operations {
                 page?: number;
                 /** @description Number of items per page */
                 limit?: number;
+                /** @description Filter by tasks in active sprints */
+                active?: boolean;
                 /** @description Filter by task description */
                 description?: string;
                 /** @description Filter by task title */

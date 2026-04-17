@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -23,13 +23,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useSortable } from "@dnd-kit/sortable";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  MoreHorizontal,
-  Plus,
-  GripVertical,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { MoreHorizontal, Plus, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { TaskDto, TaskStatus } from "@/features/tasks/types/tasks.types";
@@ -38,10 +32,8 @@ interface ScrumBoardProps {
   projectId: string;
 }
 
-// Fetch all tasks in one go — pagination handled by the infinite query internally
 const TASK_LIMIT = 1000;
 
-// API status values are uppercase
 const columns: { id: TaskStatus; label: string; color: string }[] = [
   { id: "TODO", label: "To Do", color: "bg-blue-500" },
   { id: "IN_PROGRESS", label: "In Progress", color: "bg-yellow-500" },
@@ -49,21 +41,12 @@ const columns: { id: TaskStatus; label: string; color: string }[] = [
   { id: "DONE", label: "Done", color: "bg-green-500" },
 ];
 
-const ALL_ZONE_IDS: TaskStatus[] = [
-  "BACKLOG",
-  "TODO",
-  "IN_PROGRESS",
-  "IN_REVIEW",
-  "DONE",
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+const ALL_ZONE_IDS: TaskStatus[] = ["TODO", "IN_PROGRESS", "IN_REVIEW", "DONE"];
 
 function getTaskStatus(task: TaskDto): TaskStatus | null {
   return task.metaData?.status ?? null;
 }
 
-// Pull the first assigned user's display name and avatar
 function getAssignee(task: TaskDto) {
   const first = task.assignedTo?.[0]?.user;
   if (!first) return null;
@@ -79,63 +62,17 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-// ─── SortableTaskItem ─────────────────────────────────────────────────────────
-
 interface SortableTaskProps {
   task: TaskDto;
   isDragging: boolean;
-  compact?: boolean;
 }
 
-function SortableTaskItem({
-  task,
-  isDragging,
-  compact = false,
-}: SortableTaskProps) {
+function SortableTaskItem({ task, isDragging }: SortableTaskProps) {
   const { setNodeRef, attributes, listeners, transform, transition } =
     useSortable({ id: task.id });
 
   const style = { transform: CSS.Transform.toString(transform), transition };
   const assignee = getAssignee(task);
-
-  if (compact) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className={cn(
-          "group shrink-0 w-52 rounded-lg border border-border bg-card p-3 cursor-grab active:cursor-grabbing",
-          "hover:border-primary/50 transition-all hover:shadow-md",
-          isDragging && "opacity-50 shadow-lg",
-        )}
-      >
-        <div className="flex items-start justify-between mb-1.5">
-          <span className="text-xs text-muted-foreground font-mono truncate max-w-[80%]">
-            {task.label || task.id.slice(0, 8)}
-          </span>
-          <GripVertical className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-        </div>
-        <h4 className="text-xs font-medium text-foreground line-clamp-2 mb-2">
-          {task.title}
-        </h4>
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground capitalize">
-            {task.priority?.toLowerCase()}
-          </span>
-          {assignee && (
-            <Avatar className="h-5 w-5">
-              <AvatarImage src={assignee.avatar} alt={assignee.name} />
-              <AvatarFallback className="text-xs">
-                {getInitials(assignee.name)}
-              </AvatarFallback>
-            </Avatar>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -181,8 +118,6 @@ function SortableTaskItem({
     </div>
   );
 }
-
-// ─── DroppableColumn ──────────────────────────────────────────────────────────
 
 interface DroppableColumnProps {
   id: TaskStatus;
@@ -248,87 +183,6 @@ function DroppableColumn({
   );
 }
 
-// ─── BacklogSection ───────────────────────────────────────────────────────────
-
-interface BacklogSectionProps {
-  tasks: TaskDto[];
-  isDraggingOver: boolean;
-  activeId: string | null;
-}
-
-function BacklogSection({
-  tasks,
-  isDraggingOver,
-  activeId,
-}: BacklogSectionProps) {
-  const { setNodeRef } = useDroppable({ id: "BACKLOG" });
-  const [collapsed, setCollapsed] = useState(false);
-
-  return (
-    <div className="mt-8 border-t border-border pt-6">
-      <div className="flex items-center justify-between mb-3">
-        <button
-          onClick={() => setCollapsed((c) => !c)}
-          className="flex items-center gap-2 hover:text-primary transition-colors"
-        >
-          {collapsed ? (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-          )}
-          <span className="text-sm font-semibold text-foreground">Backlog</span>
-          <span className="text-xs text-muted-foreground rounded-full bg-secondary px-2 py-0.5">
-            {tasks.length}
-          </span>
-        </button>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
-          <Plus className="h-4 w-4 text-muted-foreground" />
-        </Button>
-      </div>
-
-      {!collapsed && (
-        <div
-          ref={setNodeRef}
-          className={cn(
-            "rounded-lg border-2 border-dashed border-border p-3 transition-colors min-h-24",
-            isDraggingOver
-              ? "border-primary/50 bg-primary/5"
-              : tasks.length > 0
-                ? "border-transparent bg-secondary/30"
-                : "bg-secondary/10",
-          )}
-        >
-          {tasks.length === 0 ? (
-            <div className="flex items-center justify-center h-16">
-              <p className="text-sm text-muted-foreground">
-                Drag tasks here to send them back to the backlog
-              </p>
-            </div>
-          ) : (
-            <SortableContext
-              items={tasks.map((t) => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {tasks.map((task) => (
-                  <SortableTaskItem
-                    key={task.id}
-                    task={task}
-                    isDragging={activeId === task.id}
-                    compact
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── TaskDragOverlay ──────────────────────────────────────────────────────────
-
 function TaskDragOverlay({ task }: { task: TaskDto | null }) {
   if (!task) return null;
   return (
@@ -343,10 +197,14 @@ function TaskDragOverlay({ task }: { task: TaskDto | null }) {
   );
 }
 
-// ─── ScrumBoard (root) ────────────────────────────────────────────────────────
-
 function emptyBoard(): Record<TaskStatus, TaskDto[]> {
-  return { BACKLOG: [], TODO: [], IN_PROGRESS: [], IN_REVIEW: [], DONE: [] };
+  return {
+    TODO: [],
+    IN_PROGRESS: [],
+    IN_REVIEW: [],
+    DONE: [],
+    BACKLOG: [],
+  };
 }
 
 export function ScrumBoard({ projectId }: ScrumBoardProps) {
@@ -358,19 +216,19 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
   const { data, isLoading, isError } = useTasks({
     project_id: projectId,
     limit: TASK_LIMIT,
+    active: true,
   });
 
-  // Sync server data into local drag-and-drop state whenever the query result changes.
-  // Local moves are reflected immediately; this effect re-syncs if the server data refreshes.
-  useEffect(() => {
-    if (!data?.tasks) return;
+  const [prevTasks, setPrevTasks] = useState(data?.tasks);
+  if (data?.tasks !== prevTasks) {
+    setPrevTasks(data?.tasks);
     const grouped = emptyBoard();
-    data.tasks.forEach((task) => {
+    (data?.tasks ?? []).forEach((task) => {
       const status = getTaskStatus(task);
       if (status) grouped[status].push(task);
     });
     setTasksByStatus(grouped);
-  }, [data?.tasks]);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -411,7 +269,6 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
 
     if (!over || active.id === over.id) return;
 
-    // Find source
     let sourceStatus: TaskStatus | null = null;
     let sourceIndex = -1;
     for (const [status, tasks] of Object.entries(tasksByStatus)) {
@@ -424,7 +281,6 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
     }
     if (!sourceStatus || sourceIndex === -1) return;
 
-    // Find target
     let targetStatus: TaskStatus | null = null;
     let targetIndex = -1;
     const overZone = ALL_ZONE_IDS.find((id) => id === over.id);
@@ -452,30 +308,25 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
           targetIndex,
         );
       } else {
-        const srcArr = [...next[sourceStatus!]];
-        const tgtArr = [...next[targetStatus!]];
+        const srcArr = [...next[sourceStatus]];
+        const tgtArr = [...next[targetStatus]];
         const [moved] = srcArr.splice(sourceIndex, 1);
         if (moved) {
-          // status lives inside metaData — update it there
           const updatedMoved: TaskDto = {
             ...moved,
             metaData: moved.metaData
-              ? { ...moved.metaData, status: targetStatus! }
+              ? { ...moved.metaData, status: targetStatus }
               : undefined,
           };
           tgtArr.splice(targetIndex, 0, updatedMoved);
         }
-        next[sourceStatus!] = srcArr;
-        next[targetStatus!] = tgtArr;
+        next[sourceStatus] = srcArr;
+        next[targetStatus] = tgtArr;
       }
       return next;
     });
-
-    // TODO: call your PATCH /tasks/:id endpoint here to persist the status change
-    // e.g. taskApi.updateTask(active.id as string, { status: targetStatus })
   };
 
-  // Find the task currently being dragged from live state
   let activeDraggedTask: TaskDto | undefined;
   if (activeId) {
     for (const tasks of Object.values(tasksByStatus)) {
@@ -515,7 +366,7 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
   }
 
   return (
-    <div className="p-6">
+    <div className="h-full overflow-hidden">
       <DndContext
         sensors={sensors}
         collisionDetection={rectIntersection}
@@ -527,27 +378,21 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
           items={allDraggableIds}
           strategy={verticalListSortingStrategy}
         >
-          {/* Board columns */}
-          <div className="flex gap-4 overflow-x-auto min-h-64">
-            {columns.map((column) => (
-              <DroppableColumn
-                key={column.id}
-                id={column.id}
-                label={column.label}
-                color={column.color}
-                tasks={tasksByStatus[column.id] ?? []}
-                isDraggingOver={dragOverColumn === column.id}
-                activeId={activeId}
-              />
-            ))}
+          <div className="h-full overflow-auto">
+            <div className="flex gap-4 p-6">
+              {columns.map((column) => (
+                <DroppableColumn
+                  key={column.id}
+                  id={column.id}
+                  label={column.label}
+                  color={column.color}
+                  tasks={tasksByStatus[column.id] ?? []}
+                  isDraggingOver={dragOverColumn === column.id}
+                  activeId={activeId}
+                />
+              ))}
+            </div>
           </div>
-
-          {/* Backlog strip */}
-          <BacklogSection
-            tasks={tasksByStatus.BACKLOG ?? []}
-            isDraggingOver={dragOverColumn === "BACKLOG"}
-            activeId={activeId}
-          />
         </SortableContext>
 
         <DragOverlay>
