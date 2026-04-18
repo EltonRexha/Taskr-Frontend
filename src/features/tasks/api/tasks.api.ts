@@ -5,6 +5,8 @@ import {
   TasksResponse,
   TaskSummaryQueryParams,
   TaskSummaryResponse,
+  CreateTaskRequest,
+  TaskDto,
 } from "../types/tasks.types";
 
 export const taskApi = {
@@ -40,6 +42,11 @@ export const taskApi = {
       params: query,
     });
 
+    return response.data;
+  },
+
+  createTask: async (data: CreateTaskRequest) => {
+    const response = await api.post<TaskDto>("/tasks", data);
     return response.data;
   },
 };

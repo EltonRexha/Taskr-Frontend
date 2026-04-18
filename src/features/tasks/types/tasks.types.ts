@@ -13,3 +13,8 @@ export type TaskSummaryResponse =
   operations["TasksController_getTasksSummary"]["responses"]["200"]["content"]["application/json"];
 
 export type TaskStatus = components["schemas"]["TaskMetaDto"]["status"];
+
+export type CreateTaskRequest =
+  paths["/tasks"]["post"]["requestBody"]["content"]["application/json"] & {
+    sprintId: string;
+  };

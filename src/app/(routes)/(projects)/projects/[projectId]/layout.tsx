@@ -10,7 +10,7 @@ export default async function DashboardLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ slug: string }>;
+  params: Promise<{ projectId: string }>;
 }) {
   const queryParams = await params;
   return (

@@ -33,7 +33,7 @@ export function Sidebar({
     isLoading,
   } = useProjects({
     limit: SIDEBAR_PROJECT_LIMIT,
-    project_name_like: projectNameFilter,
+    project_name_like: projectNameFilter ? projectNameFilter : undefined,
   });
 
   const nav = getActiveDashboardNav(pathname, urlNavOptions);

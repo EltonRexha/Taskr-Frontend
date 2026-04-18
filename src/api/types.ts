@@ -158,6 +158,41 @@ export interface components {
             projects: components["schemas"]["ProjectDto"][];
             metadata: components["schemas"]["ResponsePaginationDto"];
         };
+        CreateTaskDto: {
+            /** @description Task title */
+            title: string;
+            /** @description Task description */
+            description: string;
+            /**
+             * @description Task label
+             * @enum {string}
+             */
+            label: "BUG" | "FEATURE" | "TASK" | "REFACTOR" | "CHORE" | "SPIKE" | "TECH_DEBT";
+            /**
+             * @description Task priority
+             * @enum {string}
+             */
+            priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+            /** @description Project ID */
+            projectId: string;
+            /**
+             * Format: date
+             * @description Start date in YYYY-MM-DD format
+             */
+            startDate: string;
+            /**
+             * Format: date
+             * @description Due date in YYYY-MM-DD format
+             */
+            dueDate: string;
+            /**
+             * @description Initial status for the task (defaults to TODO)
+             * @enum {string}
+             */
+            status?: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE" | "BACKLOG";
+            /** @description Array of project member clerkIds to assign the task to */
+            assignedTo?: string[];
+        };
         UserDto: {
             /** @example john.doe@example.com */
             email: string;
@@ -406,13 +441,19 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTaskDto"];
+            };
+        };
         responses: {
-            201: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TaskDto"];
+                };
             };
         };
     };

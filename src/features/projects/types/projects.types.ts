@@ -1,4 +1,6 @@
-import { paths } from "@/api/types";
+import { paths, components } from "@/api/types";
+
+export type ProjectDto = components["schemas"]["ProjectDto"];
 
 export type GetProjectsQuery = paths["/projects"]["get"]["parameters"]["query"];
 export type GetProjectsResponse =

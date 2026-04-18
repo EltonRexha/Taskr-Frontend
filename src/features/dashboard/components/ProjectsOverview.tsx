@@ -93,7 +93,7 @@ export function ProjectsOverview() {
             return (
               <Link
                 key={project.id}
-                href={`/dashboard/projects/${project.id}`}
+                href={`/projects/${project.id}`}
                 className="block"
               >
                 <div className="flex items-center justify-between mb-3">

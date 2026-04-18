@@ -1,4 +1,9 @@
-import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import projectApi from "../api/projects.api";
 import { paths } from "@/api/types";
 import { CreateProjectRequest } from "../types/projects.types";
@@ -40,8 +45,12 @@ export function useQueryProjectById(id: string) {
 }
 
 export function useMutateProjects() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateProjectRequest) => projectApi.createProject(data),
     mutationKey: projectQueryKeys.create(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectQueryKeys.all });
+    },
   });
 }

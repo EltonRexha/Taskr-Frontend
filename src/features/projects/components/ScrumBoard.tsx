@@ -27,6 +27,7 @@ import { MoreHorizontal, Plus, GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { TaskDto, TaskStatus } from "@/features/tasks/types/tasks.types";
+import { CreateTaskModal } from "@/features/tasks/components/CreateTaskModal";
 
 interface ScrumBoardProps {
   projectId: string;
@@ -126,6 +127,7 @@ interface DroppableColumnProps {
   tasks: TaskDto[];
   isDraggingOver: boolean;
   activeId: string | null;
+  onAddTask: (status: TaskStatus) => void;
 }
 
 function DroppableColumn({
@@ -135,6 +137,7 @@ function DroppableColumn({
   tasks,
   isDraggingOver,
   activeId,
+  onAddTask,
 }: DroppableColumnProps) {
   const { setNodeRef } = useDroppable({ id });
 
@@ -148,7 +151,12 @@ function DroppableColumn({
             {tasks.length}
           </span>
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6"
+          onClick={() => onAddTask(id)}
+        >
           <Plus className="h-4 w-4 text-muted-foreground" />
         </Button>
       </div>
@@ -210,8 +218,9 @@ function emptyBoard(): Record<TaskStatus, TaskDto[]> {
 export function ScrumBoard({ projectId }: ScrumBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<TaskStatus | null>(null);
-  const [tasksByStatus, setTasksByStatus] =
-    useState<Record<TaskStatus, TaskDto[]>>(emptyBoard);
+  const [tasksByStatus, setTasksByStatus] = useState<Record<TaskStatus, TaskDto[]>>(emptyBoard);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [defaultStatus, setDefaultStatus] = useState<TaskStatus>("TODO");
 
   const { data, isLoading, isError } = useTasks({
     project_id: projectId,
@@ -389,6 +398,10 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
                   tasks={tasksByStatus[column.id] ?? []}
                   isDraggingOver={dragOverColumn === column.id}
                   activeId={activeId}
+                  onAddTask={(status) => {
+                    setDefaultStatus(status);
+                    setIsModalOpen(true);
+                  }}
                 />
               ))}
             </div>
@@ -399,6 +412,13 @@ export function ScrumBoard({ projectId }: ScrumBoardProps) {
           <TaskDragOverlay task={activeDraggedTask ?? null} />
         </DragOverlay>
       </DndContext>
+
+      <CreateTaskModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        projectId={projectId}
+        defaultStatus={defaultStatus}
+      />
     </div>
   );
 }
