@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,10 @@ import { TaskStatus } from "../types/tasks.types";
 import { format } from "date-fns";
 import { useActiveSprints } from "@/features/projects/hooks/useSprints";
 import { AlertCircle } from "lucide-react";
+import { components } from "@/api/types";
+
+type CreateTaskDto = components["schemas"]["CreateTaskDto"];
+type CreateTaskFormData = CreateTaskDto & { sprintId: string };
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -64,69 +69,68 @@ export function CreateTaskModal({
   defaultStatus = "TODO",
 }: CreateTaskModalProps) {
   const createTask = useCreateTask(projectId);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { data: sprintsData, isLoading: isLoadingSprints } = useActiveSprints(projectId);
+  const { data: sprintsData, isLoading: isLoadingSprints } =
+    useActiveSprints(projectId);
   const sprints = sprintsData?.sprints ?? [];
   const hasSprints = sprints.length > 0;
   const sprintInitialized = useRef(false);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    label: "TASK" as const,
-    priority: "MEDIUM" as const,
-    status: defaultStatus,
-    startDate: format(new Date(), "yyyy-MM-dd"),
-    dueDate: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-    sprintId: "",
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<CreateTaskFormData>({
+    defaultValues: {
+      title: "",
+      description: "",
+      label: "TASK",
+      priority: "MEDIUM",
+      status: defaultStatus,
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      dueDate: format(new Date(), "yyyy-MM-dd"),
+      sprintId: "",
+      projectId,
+    },
   });
 
   useEffect(() => {
     if (sprints.length > 0 && !sprintInitialized.current) {
       sprintInitialized.current = true;
-      setFormData((prev) => ({ ...prev, sprintId: sprints[0].id }));
+      setValue("sprintId", sprints[0].id);
     }
-  }, [sprints]);
+  }, [sprints, setValue]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.title.trim() || !formData.description.trim() || !formData.sprintId) return;
-
-    setIsSubmitting(true);
-    try {
-      await createTask.mutateAsync({
-        title: formData.title,
-        description: formData.description,
-        label: formData.label,
-        priority: formData.priority,
-        projectId,
-        startDate: formData.startDate,
-        dueDate: formData.dueDate,
-        status: formData.status,
-        sprintId: formData.sprintId,
-      });
-      onClose();
-      // Reset form
-      setFormData({
-        title: "",
-        description: "",
-        label: "TASK",
-        priority: "MEDIUM",
-        status: defaultStatus,
-        startDate: format(new Date(), "yyyy-MM-dd"),
-        dueDate: format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), "yyyy-MM-dd"),
-        sprintId: sprints[0]?.id ?? "",
-      });
-    } finally {
-      setIsSubmitting(false);
+  // Update status when modal opens with new defaultStatus
+  useEffect(() => {
+    if (isOpen) {
+      setValue("status", defaultStatus);
     }
+  }, [isOpen, defaultStatus, setValue]);
+
+  const onSubmit = async (data: CreateTaskFormData) => {
+    await createTask.mutateAsync(data);
+    onClose();
+    reset({
+      title: "",
+      description: "",
+      label: "TASK",
+      priority: "MEDIUM",
+      status: defaultStatus,
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      dueDate: format(new Date(), "yyyy-MM-dd"),
+      sprintId: sprints[0]?.id ?? "",
+      projectId,
+    });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Create New Task</DialogTitle>
             <DialogDescription>
@@ -141,7 +145,8 @@ export function CreateTaskModal({
                 <div>
                   <p className="font-medium">No active sprints found</p>
                   <p className="text-xs mt-1">
-                    You need to create a sprint first before you can add tasks to this project.
+                    You need to create a sprint first before you can add tasks
+                    to this project.
                   </p>
                 </div>
               </div>
@@ -153,134 +158,150 @@ export function CreateTaskModal({
               <Label htmlFor="title">Title *</Label>
               <Input
                 id="title"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, title: e.target.value }))
-                }
+                {...register("title", { required: "Title is required" })}
                 placeholder="Enter task title"
-                required
               />
+              {errors.title && (
+                <p className="text-red-500 text-sm">{errors.title.message}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="description">Description *</Label>
               <Textarea
                 id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
+                {...register("description", {
+                  required: "Description is required",
+                })}
                 placeholder="Enter task description"
                 rows={3}
-                required
               />
+              {errors.description && (
+                <p className="text-red-500 text-sm">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="label">Label</Label>
-                <Select
-                  value={formData.label}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      label: value as typeof prev.label,
-                    }))
-                  }
-                >
-                  <SelectTrigger id="label">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TASK_LABELS.map((label) => (
-                      <SelectItem key={label.value} value={label.value}>
-                        <div className="flex items-center gap-2">
-                          <div className={`h-2 w-2 rounded-full ${label.color}`} />
-                          {label.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="label"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="label">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TASK_LABELS.map((label) => (
+                          <SelectItem key={label.value} value={label.value}>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`h-2 w-2 rounded-full ${label.color}`}
+                              />
+                              {label.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="priority">Priority</Label>
-                <Select
-                  value={formData.priority}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      priority: value as typeof prev.priority,
-                    }))
-                  }
-                >
-                  <SelectTrigger id="priority">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TASK_PRIORITIES.map((priority) => (
-                      <SelectItem key={priority.value} value={priority.value}>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`h-2 w-2 rounded-full ${priority.color}`}
-                          />
-                          {priority.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="priority"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger id="priority">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TASK_PRIORITIES.map((priority) => (
+                          <SelectItem
+                            key={priority.value}
+                            value={priority.value}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`h-2 w-2 rounded-full ${priority.color}`}
+                              />
+                              {priority.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    status: value as TaskStatus,
-                  }))
-                }
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {TASK_STATUSES.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="status">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TASK_STATUSES.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="sprint">Sprint *</Label>
-              <Select
-                value={formData.sprintId}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({ ...prev, sprintId: value }))
-                }
-                disabled={!hasSprints || isLoadingSprints}
-              >
-                <SelectTrigger id="sprint">
-                  <SelectValue placeholder={isLoadingSprints ? "Loading sprints..." : "Select a sprint"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {sprints.map((sprint) => (
-                    <SelectItem key={sprint.id} value={sprint.id}>
-                      {sprint.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="sprintId"
+                control={control}
+                rules={{ required: "Please select a sprint" }}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={!hasSprints || isLoadingSprints}
+                  >
+                    <SelectTrigger id="sprint">
+                      <SelectValue
+                        placeholder={
+                          isLoadingSprints
+                            ? "Loading sprints..."
+                            : "Select a sprint"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sprints.map((sprint) => (
+                        <SelectItem key={sprint.id} value={sprint.id}>
+                          {sprint.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.sprintId && (
+                <p className="text-red-500 text-sm">
+                  {errors.sprintId.message}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -289,15 +310,11 @@ export function CreateTaskModal({
                 <Input
                   id="startDate"
                   type="date"
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      startDate: e.target.value,
-                    }))
-                  }
-                  required
+                  {...register("startDate", { required: true })}
                 />
+                {errors.startDate && (
+                  <p className="text-red-500 text-sm">Required</p>
+                )}
               </div>
 
               <div className="grid gap-2">
@@ -305,15 +322,11 @@ export function CreateTaskModal({
                 <Input
                   id="dueDate"
                   type="date"
-                  value={formData.dueDate}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      dueDate: e.target.value,
-                    }))
-                  }
-                  required
+                  {...register("dueDate", { required: true })}
                 />
+                {errors.dueDate && (
+                  <p className="text-red-500 text-sm">Required</p>
+                )}
               </div>
             </div>
           </div>
@@ -327,7 +340,7 @@ export function CreateTaskModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || !formData.title.trim() || !formData.sprintId}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating..." : "Create Task"}
             </Button>
           </DialogFooter>
