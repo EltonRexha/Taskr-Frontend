@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { useTasks } from "@/features/tasks/hooks/useTasks";
 import { TaskDto, TaskStatus } from "@/features/tasks/types/tasks.types";
 import { CreateTaskModal } from "@/features/tasks/components/CreateTaskModal";
+import { getPriorityColor } from "@/features/tasks/libs/getPriorityColor";
 
 interface ScrumBoardProps {
   projectId: string;
@@ -104,7 +105,12 @@ function SortableTaskItem({ task, isDragging }: SortableTaskProps) {
       </h4>
 
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground capitalize">
+        <span
+          className={cn(
+            "text-xs px-2 py-0.5 rounded-full capitalize",
+            getPriorityColor(task.priority?.toLowerCase() ?? ""),
+          )}
+        >
           {task.priority?.toLowerCase()}
         </span>
         {assignee && (
